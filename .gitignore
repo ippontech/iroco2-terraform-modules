@@ -1,0 +1,15 @@
+# Commons OS / IDEs
+.DS_Store
+.idea/
+.vscode/
+*.log/
+
+# Node.js
+node_modules
+yarn-error.log
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform
