@@ -1,0 +1,101 @@
+locals {
+  working_days = ["MON", "TUE", "WED", "THU", "FRI"]
+}
+
+data "aws_iam_policy_document" "ssm" {
+
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com", "ssm.amazonaws.com"]
+    }
+
+    actions = [
+      "sts:AssumeRole",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "ssm_inline" {
+  statement {
+    actions   = ["iam:PassRole"]
+    effect    = "Allow"
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
+      "rds:DescribeDBInstances",
+      "rds:StartDBInstance",
+      "rds:StopDBInstance"
+    ]
+    effect    = "Allow"
+    resources = [module.rds.db_instance_arn]
+  }
+}
+
+resource "aws_iam_role" "ssm" {
+
+  name               = "${var.namespace}-rds-scheduling"
+  path               = "/"
+  assume_role_policy = data.aws_iam_policy_document.ssm.json
+
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"]
+
+  inline_policy {
+    name   = "ssm-inline"
+    policy = data.aws_iam_policy_document.ssm_inline.json
+  }
+}
+
+resource "aws_ssm_association" "start_rds" {
+
+  for_each = toset(local.working_days)
+
+  apply_only_at_cron_interval = true
+
+  name = "AWS-StartRdsInstance"
+
+  automation_target_parameter_name = "InstanceId"
+
+  association_name = "StartRds-${each.value}"
+
+  schedule_expression = "cron(0 6 ? * ${each.value} *)" #GMT -> 8 AM in Paris
+
+  parameters = {
+    InstanceId           = local.rds_db_identifier
+    AutomationAssumeRole = aws_iam_role.ssm.arn
+  }
+
+  targets {
+    key    = "ParameterValues"
+    values = [local.rds_db_identifier]
+  }
+}
+
+resource "aws_ssm_association" "stop_rds" {
+
+  for_each = toset(local.working_days)
+
+  name = "AWS-StopRdsInstance"
+
+  apply_only_at_cron_interval = true
+
+  automation_target_parameter_name = "InstanceId"
+
+  association_name = "StopRds-${each.value}"
+
+  schedule_expression = "cron(30 18 ? * ${each.value} *)" #GMT -> 8:30 PM in Paris
+
+  parameters = {
+    InstanceId           = local.rds_db_identifier
+    AutomationAssumeRole = aws_iam_role.ssm.arn
+  }
+
+  targets {
+    key    = "ParameterValues"
+    values = [local.rds_db_identifier]
+  }
+}
