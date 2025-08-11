@@ -21,7 +21,6 @@ resource "random_password" "rds_master_pass" {
   min_special      = 5
   override_special = "!#$%^&*()-_=+[]{}<>:?"
 
-  # TODO: Remove this after the next apply
   lifecycle {
     ignore_changes = [
       override_special,
@@ -33,8 +32,6 @@ resource "random_password" "rds_master_pass" {
 # The secret
 resource "aws_secretsmanager_secret" "rds_master_pass" {
   name = "/RDS/MASTER_PASSWORD_IROCALC_DB_SECRET"
-
-  # TODO: test automatic rotation
 }
 
 # Initial version

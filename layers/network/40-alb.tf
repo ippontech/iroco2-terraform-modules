@@ -101,7 +101,6 @@ resource "aws_lb_listener" "public_https" {
   }
 }
 
-## TODO: Remove this security group once the new ones are in place
 resource "aws_security_group" "alb_public" {
   name   = "${var.namespace}-${var.environment}-alb-public"
   vpc_id = module.vpc.vpc_id

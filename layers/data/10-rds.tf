@@ -51,7 +51,6 @@ module "rds" {
   create_db_subnet_group = true
 
   # Maintenance
-  # TODO: check if updates apply during offline hours
   maintenance_window          = "Mon:05:00-Mon:06:00"
   auto_minor_version_upgrade  = true
   allow_major_version_upgrade = false
@@ -72,7 +71,6 @@ module "rds" {
   parameters = var.rds_database_engine == "postgres" ? [{ name = "rds.force_ssl", value = "1" }] : []
 }
 
-# TODO: Remove this security group when we migrate to the new ones
 resource "aws_security_group" "rds" {
   name   = "${var.rds_database_name}-rds"
   vpc_id = data.terraform_remote_state.network.outputs.vpc_id

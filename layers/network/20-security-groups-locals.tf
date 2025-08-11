@@ -24,7 +24,6 @@ locals {
   }
 
   common_egress_rules = {
-    # TODO: remove this global rule once all workload gets the new security group
     ingress_wide_private_subnet = [
       {
         description = "Allow TLS communication from anywhere in the private subnets 0"

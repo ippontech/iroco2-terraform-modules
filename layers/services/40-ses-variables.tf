@@ -14,7 +14,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# TODO: remove this variable and the associated feature
 variable "email_addresses" {
   default = []
   type        = list(string)
