@@ -1,0 +1,43 @@
+name: Terraform CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        layer: ["api-gateway", "data", "network", "services"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v3
+
+      - name: TFLint
+        run: tflint --recursive
+        working-directory: layers/${{ matrix.layer }}
+
+      - name: Terraform Format
+        run: terraform fmt -check -recursive
+        working-directory: layers/${{ matrix.layer }}
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+        working-directory: layers/${{ matrix.layer }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: layers/${{ matrix.layer }}
