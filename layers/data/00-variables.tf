@@ -37,3 +37,8 @@ variable "project_type" {
   description = "The type of project."
   default     = "infrastructure"
 }
+
+variable "tfstate_bucket" {
+  type        = string
+  description = "The tfstate bucket where to fetch some information from the other layers."
+}
