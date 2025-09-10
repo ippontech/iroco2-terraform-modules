@@ -14,13 +14,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-data "aws_route53_zone" "main" {
-  name = var.domain_name
-}
-
 # Creates a wildcard certificate, valid for *.<environment_domain>
 resource "aws_acm_certificate" "certificate" {
-  domain_name       = "api.${var.domain_name}"
+  domain_name       = "api.${local.domain_name}"
   validation_method = "DNS"
 
   lifecycle {
