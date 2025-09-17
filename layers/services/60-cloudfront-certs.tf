@@ -16,7 +16,7 @@
 
 resource "aws_acm_certificate" "cert_docs" {
   provider          = aws.cloudfront
-  domain_name       = "docs.${var.domain_name}"
+  domain_name       = "docs.${local.domain_name}"
   validation_method = "DNS"
 
   lifecycle {
@@ -52,7 +52,7 @@ resource "aws_acm_certificate_validation" "example-validation-docs" {
 resource "aws_route53_record" "exampleDomain-a-docs" {
   provider = aws.cloudfront
   zone_id  = data.aws_route53_zone.selected.zone_id
-  name     = "docs.${var.domain_name}"
+  name     = "docs.${local.domain_name}"
   type     = "A"
   alias {
     name                   = aws_cloudfront_distribution.docs_distribution.domain_name

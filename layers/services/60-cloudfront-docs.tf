@@ -34,7 +34,7 @@ resource "aws_cloudfront_distribution" "docs_distribution" {
   enabled             = true
   default_root_object = "index.html"
 
-  aliases = ["docs.${var.domain_name}"]
+  aliases = ["docs.${local.domain_name}"]
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
