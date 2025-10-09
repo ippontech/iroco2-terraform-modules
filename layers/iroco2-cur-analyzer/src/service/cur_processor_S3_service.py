@@ -1,0 +1,105 @@
+# Copyright 2025 Ippon Technologies
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+import pandas as pd
+import json
+import re
+import isodate
+
+from io import StringIO, BytesIO
+from datetime import timedelta
+
+
+class CurProcessorS3Service:
+
+    cur_useful_column_keyname_matrix = {
+        'service_code': {
+            'csv': 'product/servicecode',
+            'parquet': 'product_servicecode'
+        },
+        'usage_type': {
+            'csv': 'lineItem/UsageType',
+            'parquet': 'line_item_usage_type'
+        },
+        'region_code': {
+            'csv': 'product/regionCode',
+            'parquet': 'product_region_code'
+        },
+        'usage_amount': {
+            'csv': 'lineItem/UsageAmount',
+            'parquet': 'line_item_usage_amount'
+        }
+    }
+
+    cur_file_type =  None
+
+    def creating_message_from_cur(self, cur, cur_file_type):
+        self.cur_file_type = cur_file_type
+        queue_messages = []
+        storage_queue_messages = self.__creating_message_from_cur_for_storage(cur)
+        queue_messages.extend(storage_queue_messages)
+
+        return queue_messages
+
+    def __create_parsed_data_message(self, row):
+        aws_data_center = row[
+            self.cur_useful_column_keyname_matrix['region_code'][self.cur_file_type]
+        ]
+        number_of_line = row['numberOfLines']
+        total_usage_amount = row['totalUsageAmount']
+        average_usage_amount = total_usage_amount / number_of_line
+        duration = isodate.duration_isoformat(timedelta(hours=number_of_line))
+        service_type_cur = "S3"
+
+        message = {
+            "storageInMo": average_usage_amount,
+            "awsDataCenter": aws_data_center,
+            "durationOfServiceOperation": duration,
+            "serviceTypeCUR": service_type_cur
+        }
+
+        return message
+
+    def __creating_message_from_cur_for_storage(self, cur):
+        useful_columns = [values[self.cur_file_type] for values in self.cur_useful_column_keyname_matrix.values()]
+        match self.cur_file_type:
+            case 'csv':
+                cur_with_useful_colum = pd.read_csv(StringIO(cur.decode('utf-8')), usecols=useful_columns, low_memory=False)
+            case 'parquet':
+                cur_with_useful_colum = pd.read_parquet(BytesIO(cur), columns=useful_columns, engine='pyarrow')
+            case _:
+                raise Exception(f'Unknown file type {self.cur_file_type}')
+        parsed_cur_by_service_s3 = (
+            cur_with_useful_colum)[cur_with_useful_colum[
+                self.cur_useful_column_keyname_matrix['service_code'][self.cur_file_type]] == 'AmazonS3'
+            ]
+        parsed_cur_by_service_s3_and_usage_type = parsed_cur_by_service_s3[
+            parsed_cur_by_service_s3[
+                self.cur_useful_column_keyname_matrix['usage_type'][self.cur_file_type]
+            ].str.contains('TimedStorage-ByteHrs', na=False)]
+
+        parsed_cur_s3_grouped_by_instance_and_region = parsed_cur_by_service_s3_and_usage_type.groupby(
+            [self.cur_useful_column_keyname_matrix['region_code'][self.cur_file_type]]
+        ).agg(
+            totalUsageAmount=(self.cur_useful_column_keyname_matrix['usage_amount'][self.cur_file_type], 'sum'),
+            numberOfLines=(self.cur_useful_column_keyname_matrix['usage_amount'][self.cur_file_type], 'size')
+        ).reset_index()
+
+        queue_messages = []
+        for index, row in parsed_cur_s3_grouped_by_instance_and_region.iterrows():
+            queue_message = self.__create_parsed_data_message(row)
+            queue_messages.append(queue_message)
+
+        return queue_messages
