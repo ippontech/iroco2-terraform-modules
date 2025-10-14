@@ -44,3 +44,7 @@ variable "aws_lambda_payload_cur_part_function_name" {
 variable "aws_lambda_payload_cur_part_invoke_arn" {
   description = "Invoke ARN of the lambda (in the outputs of the payload-cur-part lambda repository)"
 }
+variable "tfstate_bucket" {
+  type        = string
+  description = "The tfstate bucket where to fetch some information from the other layers."
+}
