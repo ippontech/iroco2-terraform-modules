@@ -23,7 +23,8 @@ data "terraform_remote_state" "lambda_authorizer" {
 
   config = {
     region = "eu-west-3"
-    bucket = "iroco-tfstates-store-${var.environment}"
+    # bucket = "iroco-tfstates-store-${var.environment}"
+    bucket = var.tfstate_bucket
     key    = "authorizer-service/eu-west-3/terraform.tfstate"
   }
 }
@@ -33,7 +34,9 @@ data "terraform_remote_state" "cur_service" {
 
   config = {
     region = "eu-west-3"
-    bucket = "iroco-tfstates-store-${var.environment}"
-    key    = "cur/eu-west-3/terraform.tfstate"
+    # bucket = "iroco-tfstates-store-${var.environment}"
+    bucket = var.tfstate_bucket
+    # key    = "cur/eu-west-3/terraform.tfstate"
+    key = "cur-analyzer-service/eu-west-3/terraform.tfstate"
   }
 }
