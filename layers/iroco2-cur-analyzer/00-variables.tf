@@ -38,5 +38,5 @@ variable "project_type" {
 
 variable "front_domain_name" {
   type        = string
-  description = "The name of the front."
+  description = "The name of the front. Used for S3 CORS configuration"
 }
