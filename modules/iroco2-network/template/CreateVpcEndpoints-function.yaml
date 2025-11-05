@@ -21,7 +21,7 @@ mainSteps:
     action: aws:executeScript
     isEnd: true
     inputs:
-      Runtime: python3.8
+      Runtime: python3.11
       Handler: create_vpc_endpoints
       Script: |
         import boto3

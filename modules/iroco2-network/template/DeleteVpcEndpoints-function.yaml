@@ -9,7 +9,7 @@ mainSteps:
     nextStep: "DeleteVpcEndpoints"
     isEnd: false
     inputs:
-      Runtime: "python3.8"
+      Runtime: "python3.11"
       Handler: "describe_vpc_endpoints"
       Script: |
         import boto3

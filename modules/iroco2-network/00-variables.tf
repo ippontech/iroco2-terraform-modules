@@ -14,8 +14,19 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-terraform {
-  backend "s3" {
-    key = "infrastructure/eu-west-3/network/terraform.tfstate"
-  }
+##################### METADATA #####################
+variable "namespace" {
+  type        = string
+  description = "The namespace in which the project is."
+  default     = "iroco2"
+}
+
+variable "environment" {
+  type        = string
+  description = "The name of the environment we are deploying to"
+}
+
+variable "domain_name" {
+  type        = string
+  description = "The domain name associated to this environment"
 }
