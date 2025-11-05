@@ -26,18 +26,6 @@ variable "environment" {
   description = "The name of the environment we are deploying to"
 }
 
-variable "project_name" {
-  type        = string
-  description = "Project's name"
-  default     = "network"
-}
-
-variable "project_type" {
-  type        = string
-  description = "The type of project."
-  default     = "infrastructure"
-}
-
 variable "domain_name" {
   type        = string
   description = "The domain name associated to this environment"
