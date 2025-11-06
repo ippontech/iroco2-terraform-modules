@@ -17,16 +17,10 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
-data "terraform_remote_state" "data" {
-  backend = "s3"
 
-  config = {
-    region = "eu-west-3"
-    bucket = var.tfstate_bucket
-    key    = "infrastructure/eu-west-3/data/terraform.tfstate"
-  }
-}
 
 data "aws_kms_public_key" "by_id" {
-  key_id = data.terraform_remote_state.data.outputs.iroco_identity_provider_key_id
+  count= (var.create_key_signature ? 0 : 1)
+  #key_id = data.terraform_remote_state.data.outputs.iroco_identity_provider_key_id
+  key_id = var.kms_key_id
 }
