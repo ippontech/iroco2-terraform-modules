@@ -13,8 +13,8 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-terraform {
-  backend "s3" {
-    key = "authorizer-service/eu-west-3/terraform.tfstate"
-  }
-}
+#terraform {
+#  backend "s3" {
+#    key = "authorizer-service/eu-west-3/terraform.tfstate"
+#  }
+#}

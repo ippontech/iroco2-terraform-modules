@@ -38,6 +38,7 @@ variable "project_type" {
 
 variable "cors_allowed_origins" {
   description = "The allowed origins for the CORS."
+  default = null
 }
 
 variable "clerk_public_key" {
@@ -58,7 +59,49 @@ variable "clerk_audience" {
   default     = "clerk_audience"
 }
 
-variable "tfstate_bucket" {
-  type        = string
-  description = "The tfstate bucket where to fetch some information from the other layers."
+variable "create_key_signature" {
+  type = bool
+  description = "Create a KMS key for signatures"
+  default = false
+}
+
+variable "key_policy" {
+  type = string
+  description = "JSON encoded KMS Key policy (use jsonencode)"
+  default = null
+}
+
+variable "kms_description" { 
+  type = string
+  description = "IROCO2 KMS Key Pair Description"
+  default = "IROCO2 KMS Key pair (public and private keys) for signing and verifying signed objects"
+}
+
+variable "region" {
+  type = string
+  default = null
+  description = "Region for KMS Key"
+}
+
+variable "tags" {
+  type = map(string)
+  default = null
+  description = "KMS key tags"
+}
+
+variable "kms_key_id" {
+  type = string
+  description = "KMS Key ARN or (if in same account) alias or ID "
+}
+
+variable "enable_key_rotation" {
+  type = string
+  description = "enable KMS key rotation or not"
+  default = true
+}
+
+variable "customer_master_key_spec" {
+  type = string
+  description = "Master Key specs"
+  default = "RSA_4096"
 }

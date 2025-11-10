@@ -33,13 +33,6 @@ data "archive_file" "authorizer" {
   output_path = local.lambda.zip_path
 }
 
-resource "aws_s3_object" "authorizer" {
-  bucket      = aws_s3_bucket.lambda_s3_bucket.bucket
-  key         = local.lambda.bucket_key
-  source      = data.archive_file.authorizer.output_path
-  source_hash = data.archive_file.authorizer.output_md5
-}
-
 resource "aws_lambda_function" "lambda_function" {
   function_name = local.lambda.function_name
   role          = aws_iam_role.lambda_role_send.arn
@@ -47,8 +40,7 @@ resource "aws_lambda_function" "lambda_function" {
   runtime       = local.lambda.runtime
   architectures = [local.lambda.arch]
 
-  s3_bucket = aws_s3_bucket.lambda_s3_bucket.bucket
-  s3_key    = aws_s3_object.authorizer.key
+  filename = local.lambda.zip_path
 
   source_code_hash = filebase64sha256(data.archive_file.authorizer.output_path)
 
@@ -56,11 +48,9 @@ resource "aws_lambda_function" "lambda_function" {
 
   environment {
     variables = {
-      "IROCO2_KMS_IDENTITY_PUBLIC_KEY" = data.aws_kms_public_key.by_id.public_key_pem
+      "IROCO2_KMS_IDENTITY_PUBLIC_KEY" = coalesce(var.kms_key_id, aws_kms_key.key)
     }
   }
-
-  depends_on = [aws_s3_object.authorizer]
 
   timeout = local.lambda.timeout
 }

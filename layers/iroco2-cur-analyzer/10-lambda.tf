@@ -23,7 +23,7 @@ locals {
     runtime       = "python3.11"
     memory        = 4096
     timeout       = 900
-    layers        = [for layer in aws_lambda_layer_version.lambda_layers : layer.arn]
+    layers        = [aws_lambda_layer_version.lambda_layers.arn]
   }
 }
 
@@ -42,17 +42,6 @@ data "archive_file" "cur_processor" {
   output_path = local.lambda.zip_path
 }
 
-resource "aws_s3_object" "cur_processor" {
-  bucket = aws_s3_bucket.lambda_s3_bucket.bucket
-
-  key    = local.lambda.bucket_key
-  source = data.archive_file.cur_processor.output_path
-  etag   = filemd5(data.archive_file.cur_processor.output_path)
-  metadata = {
-    hash = base64sha256(data.archive_file.cur_processor.output_path)
-  }
-}
-
 resource "aws_lambda_function" "lambda_function" {
 
   function_name = local.lambda.function_name
@@ -60,8 +49,7 @@ resource "aws_lambda_function" "lambda_function" {
   handler       = local.lambda.handler
   runtime       = local.lambda.runtime
 
-  s3_bucket = aws_s3_bucket.lambda_s3_bucket.bucket
-  s3_key    = aws_s3_object.cur_processor.key
+ filename = local.lambda.zip_path
 
   source_code_hash = filebase64sha256(data.archive_file.cur_processor.output_path)
 
@@ -76,7 +64,7 @@ resource "aws_lambda_function" "lambda_function" {
 
   layers = local.lambda.layers
 
-  depends_on = [aws_s3_object.cur_processor]
+  # depends_on = [aws_s3_object.cur_processor]
 
   timeout = local.lambda.timeout
 }

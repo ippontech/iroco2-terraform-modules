@@ -17,9 +17,6 @@ resource "aws_s3_bucket" "cur_s3_bucket" {
   bucket = "${var.project_name}-${var.namespace}-${var.environment}"
 }
 
-resource "aws_s3_bucket" "lambda_s3_bucket" {
-  bucket = "lambda-${var.project_name}-${var.namespace}-${var.environment}"
-}
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = aws_s3_bucket.cur_s3_bucket.id
