@@ -15,7 +15,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 locals {
-  rds_db_identifier = "irocalc-${var.environment}-rds"
+  rds_db_identifier = "${var.rds_instance_name}-${var.environment}-rds"
 }
 
 module "rds" {
