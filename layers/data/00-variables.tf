@@ -42,3 +42,9 @@ variable "tfstate_bucket" {
   type        = string
   description = "The tfstate bucket where to fetch some information from the other layers."
 }
+
+variable "rds_instance_name" {
+  type        = string
+  description = "The AWS RDS DB instance name for irocalc."
+
+}
