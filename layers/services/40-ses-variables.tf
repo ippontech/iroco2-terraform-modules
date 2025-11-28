@@ -15,7 +15,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 variable "email_addresses" {
-  default = []
+  default     = []
   type        = list(string)
   description = "List of email addresses to be used by SES to send emails to Iroco's responsibles"
 }

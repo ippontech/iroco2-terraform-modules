@@ -1,0 +1,23 @@
+# Example configuration for the IROCO2 Client Side Scanner module
+# Copy this file to terraform.tfvars and update with your actual values
+
+# AWS Configuration
+aws_region = "eu-west-3"  # Paris region
+
+# Project Configuration
+project_name = "my-iroco2-project"
+environment  = "dev"
+owner        = "my-team"
+
+# Required AWS Resources (you must provide these)
+kms_key_id   = "alias/aws/s3"  # or your KMS key ID
+aws_org_id   = "o-1234567890"  # Your AWS Organization ID
+
+# IROCO2 API Configuration (update with real endpoints)
+iroco2_api_endpoint     = "https://api.iroco2.example.com"
+iroco2_gateway_endpoint = "https://gateway.iroco2.example.com"
+iroco2_api_key         = "your-secret-api-key-here"
+
+# Optional Lambda Configuration
+lambda_timeout     = 900  # 15 minutes
+lambda_memory_size = 512  # MB

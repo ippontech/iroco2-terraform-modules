@@ -1,0 +1,6 @@
+boto3==1.35.72
+isodate==0.7.2
+pandas==2.1.4
+numpy==1.26.4
+pyarrow==14.0.1
+# Using compatible versions of pandas, numpy, and pyarrow to avoid dependency conflicts

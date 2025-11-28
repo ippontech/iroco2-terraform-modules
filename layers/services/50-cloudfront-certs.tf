@@ -16,7 +16,7 @@
 
 resource "aws_acm_certificate" "cert" {
   provider          = aws.cloudfront
-  domain_name       = var.domain_name
+  domain_name       = local.domain_name
   validation_method = "DNS"
 
   lifecycle {
@@ -47,16 +47,4 @@ resource "aws_acm_certificate_validation" "example-validation" {
   provider                = aws.cloudfront
   certificate_arn         = aws_acm_certificate.cert.arn
   validation_record_fqdns = [for record in aws_route53_record.cert-cname : record.fqdn]
-}
-
-resource "aws_route53_record" "exampleDomain-a" {
-  provider = aws.cloudfront
-  zone_id  = data.aws_route53_zone.selected.zone_id
-  name     = var.domain_name
-  type     = "A"
-  alias {
-    name                   = aws_cloudfront_distribution.s3_distribution.domain_name
-    zone_id                = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
-    evaluate_target_health = true
-  }
 }

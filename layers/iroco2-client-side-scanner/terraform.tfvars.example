@@ -1,0 +1,29 @@
+# Example Terraform variables for IROCO2 Client Side Scanner
+# Copy this file to terraform.tfvars and update with your actual values
+
+# Required variables
+kms_key_arn                = "arn:aws:kms:eu-west-3:992382519845:key/02094aa9-afab-4e3c-84b2-8082380c66eb"
+layer_bucket_storage       = "iroco-test-sylvain-scrapper"
+layer_bucket_key          = "layers/helper-scripts.zip"
+aws_org_id                = "o-yn7toj4ob7"
+cur_output_bucket_name    = "iroco-cur-bucket"
+cur_function_s3_key       = "functions/cur-scanner.zip"
+cur_function_s3_bucket    = "iroco-test-sylvain-scrapper"
+iroco2_api_endpoint       = "https://api.iroco2.example.com"
+iroco2_gateway_endpoint   = "https://gateway.iroco2.example.com"
+iroco2_api_key           = "your-api-key-here"
+
+# Optional variables (uncomment to override defaults)
+# lambda_function_name     = "IROCO2-CUR-SCRAPPER"
+# lambda_log_group_name   = "/aws/lambda/IROCO2-CUR-SCRAPPER"
+# lambda_timeout          = 900
+# lambda_memory_size      = 512
+# log_retention_days      = 14
+
+# Common tags
+common_tags = {
+  Environment = "development"
+  Project     = "IROCO2"
+  Owner       = "data-team"
+  ManagedBy   = "Terraform"
+}

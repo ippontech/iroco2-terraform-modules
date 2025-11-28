@@ -1,0 +1,43 @@
+# Simplified pre-commit configuration for IROCO2 Client Side Scanner Terraform module
+# This configuration includes only essential checks that work without additional tool installation
+repos:
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+
+  # Terraform hooks (minimal set)
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.100.0
+    hooks:
+      - id: terraform_fmt
+        description: Rewrites all Terraform configuration files to a canonical format
+        exclude : lambdas/functions/iroco2-client-side-scanner/examples/
+        files : ^lambdas/functions/iroco2-client-side-scanner/
+
+      - id: terraform_validate
+        description: Validates all Terraform configuration files
+        exclude : lambdas/functions/iroco2-client-side-scanner/examples/
+        files : ^lambdas/functions/iroco2-client-side-scanner/
+        args:
+          - --hook-config=--retry-once-with-cleanup=true
+
+# Configuration for specific hooks
+default_language_version:
+  python: python3
+
+# Global excludes
+exclude: |
+  (?x)^(
+    \.terraform/.*|
+    \.terraform\.lock\.hcl|
+    terraform\.tfstate.*|
+    \.git/.*|
+    examples\.*
+  )$

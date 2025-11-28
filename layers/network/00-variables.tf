@@ -38,7 +38,12 @@ variable "project_type" {
   default     = "infrastructure"
 }
 
-variable "domain_name" {
+variable "zone_name" {
   type        = string
-  description = "The domain name associated to this environment"
+  description = "The zone associated to this environment. Example : test.yourdomain.com"
+}
+
+variable "subdomain_name" {
+  type        = string
+  description = "The subdomain that will be prefixed to the zone name to create the final domain name. Example : `iroco2` => iroco2.test.yourdomain.com"
 }

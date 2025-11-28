@@ -16,6 +16,7 @@
 
 terraform {
   backend "s3" {
-    key = "api-gateway-infrastructure/eu-west-3/terraform.tfstate"
+    key          = "api-gateway-infrastructure/eu-west-3/terraform.tfstate"
+    use_lockfile = true
   }
 }

@@ -19,7 +19,7 @@ data "terraform_remote_state" "network" {
 
   config = {
     region = "eu-west-3"
-    bucket = "iroco-tfstates-store-${var.environment}"
+    bucket = var.tfstate_bucket
     key    = "infrastructure/eu-west-3/network/terraform.tfstate"
   }
 }

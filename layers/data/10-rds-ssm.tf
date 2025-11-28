@@ -58,12 +58,27 @@ resource "aws_iam_role" "ssm" {
   path               = "/"
   assume_role_policy = data.aws_iam_policy_document.ssm.json
 
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"]
+}
 
-  inline_policy {
-    name   = "ssm-inline"
-    policy = data.aws_iam_policy_document.ssm_inline.json
-  }
+resource "aws_iam_policy" "ssm_inline" {
+
+  name   = "ssm-inline"
+  policy = data.aws_iam_policy_document.ssm_inline.json
+
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_inline" {
+
+  role       = aws_iam_role.ssm.name
+  policy_arn = aws_iam_policy.ssm_inline.arn
+
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_automation" {
+
+  role       = aws_iam_role.ssm.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
+
 }
 
 resource "aws_ssm_association" "start_rds" {

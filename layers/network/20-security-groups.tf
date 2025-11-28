@@ -19,8 +19,12 @@ resource "aws_security_group" "this" {
 
   vpc_id = module.vpc.vpc_id
 
-  name        = each.key
+  name_prefix = each.key
   description = each.value.description
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   tags = {
     Name = each.key

@@ -1,0 +1,87 @@
+# Copyright 2025 Ippon Technologies
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+import pandas as pd
+import isodate
+from io import StringIO, BytesIO
+from datetime import timedelta
+
+
+class CurProcessorEC2Service:
+
+    cur_useful_column_keyname_matrix = {
+        'service_code': {
+            'csv': 'product/servicecode',
+            'parquet': 'product_servicecode'
+        },
+        'usage_type': {
+            'csv': 'lineItem/UsageType',
+            'parquet': 'line_item_usage_type'
+        },
+        'region_code': {
+            'csv': 'product/regionCode',
+            'parquet': 'product_region_code'
+        },
+        'instance_type': {
+            'csv': 'product/instanceType',
+            'parquet': 'product_instance_type'
+        }
+    }
+
+    def creating_message_from_cur(self, cur, cur_file_type):
+        useful_column = [values[cur_file_type] for values in self.cur_useful_column_keyname_matrix.values()]
+        match cur_file_type:
+            case 'csv':
+                cur_with_useful_colum = pd.read_csv(StringIO(cur.decode('utf-8')), usecols=useful_column, low_memory=False)
+            case 'parquet':
+                cur_with_useful_colum = pd.read_parquet(BytesIO(cur), columns=useful_column, engine='pyarrow')
+            case _:
+                raise Exception(f'Unknown file type {cur_file_type}')
+        parsed_cur_by_service_ec2 = cur_with_useful_colum[
+            cur_with_useful_colum[
+                self.cur_useful_column_keyname_matrix['service_code'][cur_file_type]
+            ].isin(['AmazonEC2'])]
+        parsed_cur_by_service_ec2_and_box_usage = parsed_cur_by_service_ec2[
+            parsed_cur_by_service_ec2[
+                self.cur_useful_column_keyname_matrix['usage_type'][cur_file_type]
+            ].str.contains('BoxUsage', na=False)]
+        parsed_cur_ec2_grouped_by_instance_and_region = parsed_cur_by_service_ec2_and_box_usage.groupby(
+            [
+                self.cur_useful_column_keyname_matrix['region_code'][cur_file_type],
+                self.cur_useful_column_keyname_matrix['instance_type'][cur_file_type]
+            ]).size().reset_index(name='numberOfLine')
+
+        queue_messages = []
+        for index, row in parsed_cur_ec2_grouped_by_instance_and_region.iterrows():
+            queue_message = self.__create_parsed_data_message(row, cur_file_type)
+            queue_messages.append(queue_message)
+
+        return queue_messages
+
+    def __create_parsed_data_message(self, row, cur_file_type):
+        aws_data_center = row[self.cur_useful_column_keyname_matrix['region_code'][cur_file_type]]
+        instance_type = row[self.cur_useful_column_keyname_matrix['instance_type'][cur_file_type]]
+        number_of_line = row['numberOfLine']
+        duration = isodate.duration_isoformat(timedelta(hours=number_of_line))
+        service_type_cur = "EC2"
+
+        message = {
+            "ec2Type": instance_type,
+            "awsDataCenter": aws_data_center,
+            "durationOfServiceOperation": duration,
+            "serviceTypeCUR": service_type_cur
+        }
+
+        return message

@@ -1,4 +1,4 @@
-schemaVersion: '0.3'
+schemaVersion: "0.3"
 description: |-
   *Replace this default text with instructions or other information about your runbook.*
 
@@ -21,16 +21,16 @@ mainSteps:
     action: aws:executeScript
     isEnd: true
     inputs:
-      Runtime: python3.8
+      Runtime: python3.11
       Handler: create_vpc_endpoints
       Script: |
         import boto3
-        
+
         def create_vpc_endpoints(events, context):
             client = boto3.client('ec2')
             created_endpoints = []
             vpc_endpoint_list = events['VpcList']
-            
+
             for endpoint in vpc_endpoint_list:
               try:
                   if endpoint["VpcEndpointType"] == "Interface":
@@ -59,4 +59,4 @@ mainSteps:
 
             return created_endpoints
       InputPayload:
-        VpcList: '{{ VpcEndpointList }}'
+        VpcList: "{{ VpcEndpointList }}"

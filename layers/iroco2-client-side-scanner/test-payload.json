@@ -1,0 +1,15 @@
+{
+  "Records": [
+    {
+      "eventName": "ObjectCreated:Copy",
+      "s3": {
+        "bucket": {
+          "name": "iroco-cur-bucket"
+        },
+        "object": {
+          "key": "iroco/iroco_CUR_report/20250901-20251001/20250918T091302Z/iroco_CUR_report-00001.csv.zip"
+        }
+      }
+    }
+  ]
+}

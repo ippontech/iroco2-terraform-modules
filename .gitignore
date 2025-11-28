@@ -13,3 +13,8 @@ yarn-error.log
 *.tfstate.backup
 *.tfvars
 .terraform
+.terraform.lock.hcl
+
+# Deployement archives & builds
+*.zip
+bootstrap
