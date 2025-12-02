@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "ssm_inline" {
 }
 
 resource "aws_iam_role" "ssm" {
-  name               = "${var.namespace}-vpc-endpoints-scheduling"
+  name               = "${var.namespace}-${var.environment}-vpc-endpoints-scheduling"
   path               = "/"
   assume_role_policy = data.aws_iam_policy_document.ssm.json
 
@@ -62,7 +62,7 @@ resource "aws_iam_role_policy_attachment" "ssm_automation" {
 
 
 resource "aws_iam_role_policy" "ssm" {
-  name   = "ssm-inline"
+  name   = "${var.namespace}-${var.environment}-ssm-inline"
   policy = data.aws_iam_policy_document.ssm_inline.json
   role   = aws_iam_role.ssm.id
 }

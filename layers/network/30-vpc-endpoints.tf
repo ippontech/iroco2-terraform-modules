@@ -21,7 +21,7 @@ variable "tag_autoshutdown" {
 }
 
 resource "aws_ssm_document" "vpcendpoints_create" {
-  name            = "CreateVpcEndpoints"
+  name            = "${var.namespace}-${var.environment}-CreateVpcEndpoints"
   document_format = "YAML"
   document_type   = "Automation"
 
@@ -31,7 +31,7 @@ resource "aws_ssm_document" "vpcendpoints_create" {
 }
 
 resource "aws_ssm_document" "vpcendpoints_delete" {
-  name            = "DeleteVpcEndpoints"
+  name            = "${var.namespace}-${var.environment}-DeleteVpcEndpoints"
   document_format = "YAML"
   document_type   = "Automation"
 
