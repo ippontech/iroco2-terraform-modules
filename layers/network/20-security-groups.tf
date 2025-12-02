@@ -27,7 +27,7 @@ resource "aws_security_group" "this" {
   }
 
   tags = {
-    Name = each.key
+    Name = "${var.namespace}-${var.environment}-${replace(each.key, "_", "-")}"
   }
 }
 
@@ -45,7 +45,7 @@ resource "aws_vpc_security_group_ingress_rule" "this" {
   ip_protocol = each.value.rule.protocol
 
   tags = {
-    Name = each.value.name
+    Name = "${var.namespace}-${var.environment}-${replace(each.value.name, "_", "-")}"
   }
 }
 
@@ -67,7 +67,7 @@ resource "aws_vpc_security_group_egress_rule" "prefix_lists" {
   prefix_list_id    = data.aws_prefix_list.prefix_list[each.value.prefix].id
 
   tags = {
-    Name = each.value.name
+    Name = "${var.namespace}-${var.environment}-${replace(each.value.name, "_", "-")}"
   }
 }
 
@@ -84,7 +84,7 @@ resource "aws_vpc_security_group_ingress_rule" "computed" {
   ip_protocol = "tcp"
 
   tags = {
-    Name = "computed_${each.value.name}"
+    Name = "computed-${replace(each.value.name, "_", "-")}"
   }
 }
 
@@ -102,6 +102,6 @@ resource "aws_vpc_security_group_egress_rule" "this" {
   ip_protocol = each.value.rule.protocol
 
   tags = {
-    Name = each.value.name
+    Name = "${var.namespace}-${var.environment}-${replace(each.value.name, "_", "-")}"
   }
 }
