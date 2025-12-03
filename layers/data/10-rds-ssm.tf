@@ -78,7 +78,7 @@ resource "aws_ssm_association" "start_rds" {
 
   apply_only_at_cron_interval = true
 
-  name = "${var.namespace}-${var.environment}-AWS-StartRdsInstance"
+  name = "AWS-StartRdsInstance"
 
   automation_target_parameter_name = "InstanceId"
 
@@ -100,7 +100,7 @@ resource "aws_ssm_association" "start_rds" {
 resource "aws_ssm_association" "stop_rds" {
   for_each = toset(local.working_days)
 
-  name = "${var.namespace}-${var.environment}-AWS-StopRdsInstance"
+  name = "AWS-StopRdsInstance"
 
   apply_only_at_cron_interval = true
 
