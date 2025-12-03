@@ -47,7 +47,7 @@ locals {
   })
 
   repositories = [
-    "irocalc-backend"
+    "${var.namespace}-${var.environment}-irocalc-backend"
   ]
 }
 
