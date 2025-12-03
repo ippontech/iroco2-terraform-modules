@@ -51,8 +51,12 @@ data "aws_iam_policy_document" "lambda_permissions" {
   }
 }
 
+resource "random_integer" "integer" {
+  min = 2
+  max = 4
+}
 resource "aws_iam_role" "lambda_role_send" {
-  name               = "iam_for_lambda"
+  name = "iam_for_lambda-${random_integer.integer.result}"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
@@ -69,7 +73,7 @@ data "aws_iam_policy_document" "log_cloud" {
     actions = [
       "logs:CreateLogStream",
       "logs:PutLogEvents"
-    ]
+    ]     
     resources = ["arn:aws:logs:*:*:*"]
   }
 }
