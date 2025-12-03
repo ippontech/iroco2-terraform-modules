@@ -26,6 +26,11 @@ variable "environment" {
   description = "The name of the environment we are deploying to"
 }
 
+variable "aws_region" {
+  type        = string
+  description = "The AWS region to deploy to (already in backend config but we need it for null resource)"
+}
+
 variable "project_name" {
   type        = string
   description = "Project's name"

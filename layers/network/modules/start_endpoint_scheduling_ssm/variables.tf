@@ -41,6 +41,10 @@ variable "RouteTableIds" {
 }
 
 # SSM
+variable "environment" {
+  type        = string
+  description = "The name of the environment we are deploying to"
+}
 
 variable "tag_autoshutdown" {
   type        = string

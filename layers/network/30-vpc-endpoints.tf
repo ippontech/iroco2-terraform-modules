@@ -54,6 +54,7 @@ module "start_endpoint_scheduling_ssm" {
 
   tag_autoshutdown = var.tag_autoshutdown
   namespace        = var.namespace
+  environment      = var.environment
   ssm_document     = aws_ssm_document.vpcendpoints_create.name
   working_days     = local.working_days
 }
@@ -64,4 +65,34 @@ module "stop_endpoint_scheduling_ssm" {
   ssm_document     = aws_ssm_document.vpcendpoints_delete.name
   tag_autoshutdown = var.tag_autoshutdown
   working_days     = local.working_days
+}
+
+# We need this local exec to clean up the VPC Endpoints (that are managed by SSM Automation) on destroy
+resource "null_resource" "cleanup_vpc_endpoints_on_destroy" {
+  triggers = {
+    vpc_id   = module.vpc.vpc_id
+    doc_name = aws_ssm_document.vpcendpoints_delete.name
+    tag_val  = var.tag_autoshutdown
+    env_val  = var.environment
+    ns_val   = var.namespace
+    region   = var.aws_region
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<EOT
+      echo "Triggering SSM Automation to clean up VPC Endpoints..."
+
+      EXECUTION_ID=$(aws ssm start-automation-execution \
+        --document-name "${self.triggers.doc_name}" \
+        --parameters "tagname=${self.triggers.tag_val},environment=${self.triggers.env_val},namespace=${self.triggers.ns_val}" \
+        --region "${self.triggers.region}" \
+        --output text --query "AutomationExecutionId")
+
+      echo "SSM Automation started. Execution ID: $EXECUTION_ID"
+
+    EOT
+  }
+
+  depends_on = [aws_security_group.this]
 }

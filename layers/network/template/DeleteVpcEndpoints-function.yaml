@@ -2,6 +2,13 @@ schemaVersion: "0.3"
 parameters:
   tagname:
     type: String
+    description: "The value of the auto-shutdown tag (e.g. true)"
+  environment:
+    type: String
+    description: "The environment tag to filter (e.g. dev, test)"
+  namespace:
+    type: String
+    description: "The namespace tag to filter (e.g. iroco2)"
 assumeRole: "${aws_iam_role_arn}"
 mainSteps:
   - name: "DescribeVpcEndpoints"
@@ -17,16 +24,25 @@ mainSteps:
         def describe_vpc_endpoints(events, context):
             client = boto3.client('ec2')
 
-            tag_name = events['tagname']
+            tag_shutdown = events['tagname']
+            tag_env      = events['environment']
+            tag_ns       = events['namespace']
 
             response = client.describe_vpc_endpoints(Filters=[
                 {
                     'Name': 'tag:auto-shutdown',
-                    'Values': [
-                        tag_name
-                    ]
+                    'Values': [tag_shutdown]
                 },
+                {
+                    'Name': 'tag:environment',
+                    'Values': [tag_env]
+                },
+                {
+                    'Name': 'tag:namespace',
+                    'Values': [tag_ns]
+                }
             ])
+        
             endpoint_ids = []
             for endpoint in response['VpcEndpoints']:
                 endpoint_ids.append(endpoint['VpcEndpointId'])
@@ -34,6 +50,8 @@ mainSteps:
             return {"value" : endpoint_ids}
       InputPayload:
         tagname: "{{tagname}}"
+        environment: "{{environment}}"
+        namespace: "{{namespace}}"
     outputs:
       - Type: "StringList"
         Name: "Output"
