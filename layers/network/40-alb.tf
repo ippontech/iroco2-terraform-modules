@@ -36,7 +36,8 @@ resource "aws_lb" "public" {
 }
 
 resource "aws_s3_bucket" "lb_logs" {
-  bucket = "${var.namespace}-${var.environment}-lb-logs"
+  bucket        = "${var.namespace}-${var.environment}-lb-logs"
+  force_destroy = true
 }
 
 data "aws_iam_policy_document" "lb_logs_access" {

@@ -38,6 +38,10 @@ locals {
           {
             Key   = "auto-shutdown"
             Value = var.tag_autoshutdown
+          },
+          {
+            Key   = "environment"
+            Value = var.environment
           }
         ]
       }

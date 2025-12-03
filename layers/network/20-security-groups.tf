@@ -19,7 +19,7 @@ resource "aws_security_group" "this" {
 
   vpc_id = module.vpc.vpc_id
 
-  name_prefix = each.key
+  name        = "${var.namespace}-${var.environment}-${replace(each.key, "_", "-")}"
   description = each.value.description
 
   lifecycle {
