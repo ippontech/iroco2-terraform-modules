@@ -21,6 +21,6 @@ resource "aws_kms_key" "iroco_identity_provider" {
 }
 
 resource "aws_kms_alias" "alias" {
-  name          = "alias/${var.namespace}-identity-provider-key"
+  name          = "alias/${var.namespace}-${var.environment}-identity-provider-key"
   target_key_id = aws_kms_key.iroco_identity_provider.id
 }

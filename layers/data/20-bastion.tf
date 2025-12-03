@@ -30,7 +30,7 @@ resource "aws_launch_template" "bastion_launch_template" {
   image_id                             = aws_ami_copy.amazon_linux_3_encrypted.id
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = var.instance_type
-  vpc_security_group_ids               = [data.terraform_remote_state.network.outputs.security_group_ids["bastion"]]
+  vpc_security_group_ids               = [data.terraform_remote_state.network.outputs.security_group_ids["${var.namespace}-${var.environment}-bastion"]]
 
   block_device_mappings {
     device_name = "/dev/xvda"
@@ -44,7 +44,6 @@ resource "aws_launch_template" "bastion_launch_template" {
     }
   }
 }
-
 
 resource "aws_autoscaling_group" "asg" {
   name                      = "${local.instance_name}-asg"
@@ -77,7 +76,6 @@ resource "aws_autoscaling_group" "asg" {
 }
 
 # scheduling
-
 resource "aws_autoscaling_schedule" "schedule_work_hours_down" {
   scheduled_action_name  = "schedule_work_hours_down"
   min_size               = 0

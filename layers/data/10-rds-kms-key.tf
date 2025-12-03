@@ -22,7 +22,7 @@ resource "aws_kms_key" "rds" {
 }
 
 resource "aws_kms_alias" "rds" {
-  name          = "alias/kms-key-rds-irocalc"
+  name          = "alias/${var.namespace}-${var.environment}-kms-key-rds-irocalc"
   target_key_id = aws_kms_key.rds.id
 }
 
