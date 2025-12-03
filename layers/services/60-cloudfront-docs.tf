@@ -16,7 +16,7 @@
 
 resource "aws_cloudfront_origin_access_control" "docs" {
   provider                          = aws.cloudfront
-  name                              = "${var.namespace}-docs"
+  name                              = "${var.namespace}-${var.environment}-docs"
   description                       = "CloudFront docs access policy"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
@@ -74,13 +74,13 @@ resource "aws_cloudfront_distribution" "docs_distribution" {
   }
 
   viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate_validation.example-validation-docs.certificate_arn
+    acm_certificate_arn = aws_acm_certificate_validation.example_validation_docs.certificate_arn
     ssl_support_method  = "sni-only"
   }
 
   tags = {
     Environment = var.environment
-    Name        = "${var.namespace}-docs"
+    Name        = "${var.namespace}-${var.environment}-docs"
   }
 }
 

@@ -24,7 +24,7 @@ resource "aws_acm_certificate" "cert" {
   }
 }
 
-resource "aws_route53_record" "cert-cname" {
+resource "aws_route53_record" "cert_cname" {
   provider = aws.cloudfront
   for_each = {
     for dvo in aws_acm_certificate.cert.domain_validation_options : dvo.domain_name => {
@@ -43,8 +43,8 @@ resource "aws_route53_record" "cert-cname" {
 }
 
 
-resource "aws_acm_certificate_validation" "example-validation" {
+resource "aws_acm_certificate_validation" "acm_cert_validation" {
   provider                = aws.cloudfront
   certificate_arn         = aws_acm_certificate.cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.cert-cname : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.cert_cname : record.fqdn]
 }
