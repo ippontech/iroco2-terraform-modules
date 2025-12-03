@@ -14,9 +14,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-resource "aws_cloudfront_origin_access_control" "example" {
+resource "aws_cloudfront_origin_access_control" "cloudfront_oac" {
   provider                          = aws.cloudfront
-  name                              = "${var.namespace}-frontend"
+  name                              = "${var.namespace}-${var.environment}-frontend"
   description                       = "cloudfront irocal access policy"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
@@ -28,7 +28,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
     domain_name              = aws_s3_bucket.bucket.bucket_regional_domain_name
     origin_id                = "S3-bucket"
-    origin_access_control_id = aws_cloudfront_origin_access_control.example.id
+    origin_access_control_id = aws_cloudfront_origin_access_control.cloudfront_oac.id
   }
 
   enabled             = true
@@ -68,7 +68,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate_validation.example-validation.certificate_arn
+    acm_certificate_arn = aws_acm_certificate_validation.acm_cert_validation.certificate_arn
     ssl_support_method  = "sni-only"
   }
 }
@@ -78,7 +78,7 @@ resource "aws_s3_bucket" "bucket" {
   bucket   = "${var.namespace}-cloudfront-${var.environment}-bucket"
 }
 
-resource "aws_s3_bucket_cors_configuration" "example" {
+resource "aws_s3_bucket_cors_configuration" "cors" {
   provider = aws.cloudfront
   bucket   = aws_s3_bucket.bucket.bucket
   cors_rule {
@@ -89,13 +89,13 @@ resource "aws_s3_bucket_cors_configuration" "example" {
   }
 }
 
-resource "aws_s3_bucket_policy" "bucket-policy" {
+resource "aws_s3_bucket_policy" "bucket_policy" {
   provider = aws.cloudfront
   bucket   = aws_s3_bucket.bucket.bucket
-  policy   = data.aws_iam_policy_document.example.json
+  policy   = data.aws_iam_policy_document.s3_policy.json
 }
 
-data "aws_iam_policy_document" "example" {
+data "aws_iam_policy_document" "s3_policy" {
   provider = aws.cloudfront
   statement {
     sid       = "AllowCloudFrontServicePrincipal"
