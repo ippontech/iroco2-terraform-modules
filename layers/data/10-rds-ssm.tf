@@ -53,45 +53,36 @@ data "aws_iam_policy_document" "ssm_inline" {
 }
 
 resource "aws_iam_role" "ssm" {
-
-  name               = "${var.namespace}-rds-scheduling"
+  name               = "${var.namespace}-${var.environment}-rds-scheduling"
   path               = "/"
   assume_role_policy = data.aws_iam_policy_document.ssm.json
-
 }
 
 resource "aws_iam_policy" "ssm_inline" {
-
-  name   = "ssm-inline"
+  name   = "${var.namespace}-${var.environment}-ssm-inline"
   policy = data.aws_iam_policy_document.ssm_inline.json
-
 }
 
 resource "aws_iam_role_policy_attachment" "ssm_inline" {
-
   role       = aws_iam_role.ssm.name
   policy_arn = aws_iam_policy.ssm_inline.arn
-
 }
 
 resource "aws_iam_role_policy_attachment" "ssm_automation" {
-
   role       = aws_iam_role.ssm.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
-
 }
 
 resource "aws_ssm_association" "start_rds" {
-
   for_each = toset(local.working_days)
 
   apply_only_at_cron_interval = true
 
-  name = "AWS-StartRdsInstance"
+  name = "${var.namespace}-${var.environment}-AWS-StartRdsInstance"
 
   automation_target_parameter_name = "InstanceId"
 
-  association_name = "StartRds-${each.value}"
+  association_name = "${var.namespace}-${var.environment}-StartRds-${each.value}"
 
   schedule_expression = "cron(0 6 ? * ${each.value} *)" #GMT -> 8 AM in Paris
 
@@ -107,16 +98,15 @@ resource "aws_ssm_association" "start_rds" {
 }
 
 resource "aws_ssm_association" "stop_rds" {
-
   for_each = toset(local.working_days)
 
-  name = "AWS-StopRdsInstance"
+  name = "${var.namespace}-${var.environment}-AWS-StopRdsInstance"
 
   apply_only_at_cron_interval = true
 
   automation_target_parameter_name = "InstanceId"
 
-  association_name = "StopRds-${each.value}"
+  association_name = "${var.namespace}-${var.environment}-StopRds-${each.value}"
 
   schedule_expression = "cron(30 18 ? * ${each.value} *)" #GMT -> 8:30 PM in Paris
 

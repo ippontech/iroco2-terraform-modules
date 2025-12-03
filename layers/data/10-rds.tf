@@ -15,7 +15,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 locals {
-  rds_db_identifier = "${var.rds_instance_name}-${var.environment}-rds"
+  rds_db_identifier = "${var.namespace}-${var.environment}-${var.rds_instance_name}-rds"
 }
 
 module "rds" {
@@ -46,7 +46,7 @@ module "rds" {
 
   # Network
   port                   = var.rds_database_port
-  vpc_security_group_ids = [data.terraform_remote_state.network.outputs.security_group_ids["iroco_database"], aws_security_group.rds.id]
+  vpc_security_group_ids = [data.terraform_remote_state.network.outputs.security_group_ids["${var.namespace}-${var.environment}-iroco-database"], aws_security_group.rds.id]
   subnet_ids             = data.terraform_remote_state.network.outputs.database_subnets_ids
   create_db_subnet_group = true
 
@@ -72,8 +72,9 @@ module "rds" {
 }
 
 resource "aws_security_group" "rds" {
-  name   = "${var.rds_database_name}-rds"
+  name   = local.rds_db_identifier
   vpc_id = data.terraform_remote_state.network.outputs.vpc_id
+
   ingress {
     from_port   = var.rds_database_port
     to_port     = var.rds_database_port
