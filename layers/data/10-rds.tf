@@ -65,7 +65,7 @@ module "rds" {
   enabled_cloudwatch_logs_exports = var.rds_database_engine == "postgres" ? ["postgresql", "upgrade"] : []
   create_cloudwatch_log_group     = true
 
-  deletion_protection = true
+  deletion_protection = var.rds_deletion_protection
   apply_immediately   = true
 
   parameters = var.rds_database_engine == "postgres" ? [{ name = "rds.force_ssl", value = "1" }] : []

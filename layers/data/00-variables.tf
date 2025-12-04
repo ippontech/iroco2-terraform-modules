@@ -46,5 +46,9 @@ variable "tfstate_bucket" {
 variable "rds_instance_name" {
   type        = string
   description = "The AWS RDS DB instance name for irocalc."
+}
 
+variable "rds_deletion_protection" {
+  type        = bool
+  description = "If the RDS instance should have deletion protection enabled."
 }
