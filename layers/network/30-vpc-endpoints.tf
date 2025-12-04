@@ -94,5 +94,9 @@ resource "null_resource" "cleanup_vpc_endpoints_on_destroy" {
     EOT
   }
 
-  depends_on = [aws_security_group.this]
+  depends_on = [
+    aws_security_group.this,
+    aws_iam_role.ssm,
+    aws_iam_role_policy.ssm
+  ]
 }
