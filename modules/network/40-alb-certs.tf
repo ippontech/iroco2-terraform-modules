@@ -22,10 +22,13 @@ resource "aws_acm_certificate" "certificate" {
   lifecycle {
     create_before_destroy = true
   }
+
+  tags_all = {
+    project = var.project_name
+  }
 }
 
 resource "aws_route53_record" "records" {
-
   for_each = {
     for dvo in aws_acm_certificate.certificate.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name

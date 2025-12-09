@@ -14,13 +14,29 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-provider "aws" {
-  default_tags {
-    tags = {
-      namespace    = var.namespace
-      project_type = var.project_type
-      project      = var.project_name
-      environment  = var.environment
-    }
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.0.0"
+
+  name = "${var.namespace}-${var.environment}"
+
+  cidr = var.cidr
+
+  azs              = var.azs[data.aws_region.this.name]
+  public_subnets   = var.public_subnets
+  private_subnets  = var.private_subnets
+  database_subnets = var.database_subnets
+
+  enable_nat_gateway = var.enable_nat_gateway
+  single_nat_gateway = var.single_nat_gateway
+
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
+  map_public_ip_on_launch = true
+
+  vpc_tags = {
+    Name    = "${var.namespace}-${var.environment}-vpc"
+    project = var.project_name
   }
 }

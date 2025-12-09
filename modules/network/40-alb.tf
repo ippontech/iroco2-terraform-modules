@@ -33,11 +33,19 @@ resource "aws_lb" "public" {
   depends_on = [
     aws_s3_bucket_policy.lb_logs
   ]
+
+  tags_all = {
+    project = var.project_name
+  }
 }
 
 resource "aws_s3_bucket" "lb_logs" {
   bucket        = "${var.namespace}-${var.environment}-lb-logs"
   force_destroy = true
+
+  tags_all = {
+    project = var.project_name
+  }
 }
 
 data "aws_iam_policy_document" "lb_logs_access" {
@@ -80,6 +88,10 @@ resource "aws_lb_listener" "public_http" {
       status_code = "HTTP_301"
     }
   }
+
+  tags_all = {
+    project = var.project_name
+  }
 }
 
 resource "aws_lb_listener" "public_https" {
@@ -90,8 +102,6 @@ resource "aws_lb_listener" "public_https" {
   ssl_policy      = "ELBSecurityPolicy-2016-08"
   certificate_arn = aws_acm_certificate_validation.certificate_validation.certificate_arn
 
-
-
   default_action {
     type = "fixed-response"
     fixed_response {
@@ -99,6 +109,10 @@ resource "aws_lb_listener" "public_https" {
       message_body = "IroCalc [WIP]"
       status_code  = "200"
     }
+  }
+
+  tags_all = {
+    project = var.project_name
   }
 }
 
@@ -139,5 +153,9 @@ resource "aws_security_group" "alb_public" {
     to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags_all = {
+    project = var.project_name
   }
 }
