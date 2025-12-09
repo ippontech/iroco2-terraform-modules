@@ -11,3 +11,16 @@ module "network" {
   subdomain_name   = var.subdomain_name
   zone_name        = var.zone_name
 }
+
+module "services" {
+  source = "./modules/services"
+
+  environment = var.environment
+  aws_region  = var.aws_region
+
+  container_insight_setting_value = var.container_insight_setting_value
+  capacity_provider               = var.capacity_provider
+  subdomain_name                  = var.subdomain_name
+  zone_name                       = var.zone_name
+  email_addresses                 = var.email_addresses
+}
