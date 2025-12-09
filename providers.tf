@@ -14,9 +14,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-terraform {
-  backend "s3" {
-    key          = "infrastructure/eu-west-3/network/terraform.tfstate"
-    use_lockfile = true
+provider "aws" {
+  default_tags {
+    tags = {
+      namespace    = var.namespace
+      project_type = var.project_type
+      environment  = var.environment
+    }
   }
 }

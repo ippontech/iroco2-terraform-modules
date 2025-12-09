@@ -27,7 +27,8 @@ resource "aws_security_group" "this" {
   }
 
   tags = {
-    Name = "${var.namespace}-${var.environment}-${replace(each.key, "_", "-")}"
+    Name    = "${var.namespace}-${var.environment}-${replace(each.key, "_", "-")}"
+    project = var.project_name
   }
 }
 
@@ -45,7 +46,8 @@ resource "aws_vpc_security_group_ingress_rule" "this" {
   ip_protocol = each.value.rule.protocol
 
   tags = {
-    Name = "${var.namespace}-${var.environment}-${replace(each.value.name, "_", "-")}"
+    Name    = "${var.namespace}-${var.environment}-${replace(each.value.name, "_", "-")}"
+    project = var.project_name
   }
 }
 
@@ -67,7 +69,8 @@ resource "aws_vpc_security_group_egress_rule" "prefix_lists" {
   prefix_list_id    = data.aws_prefix_list.prefix_list[each.value.prefix].id
 
   tags = {
-    Name = "${var.namespace}-${var.environment}-${replace(each.value.name, "_", "-")}"
+    Name    = "${var.namespace}-${var.environment}-${replace(each.value.name, "_", "-")}"
+    project = var.project_name
   }
 }
 
@@ -84,7 +87,8 @@ resource "aws_vpc_security_group_ingress_rule" "computed" {
   ip_protocol = "tcp"
 
   tags = {
-    Name = "computed-${replace(each.value.name, "_", "-")}"
+    Name    = "computed-${replace(each.value.name, "_", "-")}"
+    project = var.project_name
   }
 }
 
@@ -102,6 +106,7 @@ resource "aws_vpc_security_group_egress_rule" "this" {
   ip_protocol = each.value.rule.protocol
 
   tags = {
-    Name = "${var.namespace}-${var.environment}-${replace(each.value.name, "_", "-")}"
+    Name    = "${var.namespace}-${var.environment}-${replace(each.value.name, "_", "-")}"
+    project = var.project_name
   }
 }

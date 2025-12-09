@@ -15,21 +15,26 @@
 # SPDX-License-Identifier: Apache-2.0
 
 output "vpc_id" {
-  value = module.vpc.vpc_id
+  value       = module.vpc.vpc_id
+  description = "VPC ID"
 }
 
 output "private_subnet_ids" {
-  value = module.vpc.private_subnets
+  value       = module.vpc.private_subnets
+  description = "Private subnet IDs"
 }
 
 output "database_subnets_ids" {
-  value = module.vpc.database_subnets
+  value       = module.vpc.database_subnets
+  description = "Database subnet IDs"
 }
 
 output "security_group_ids" {
-  value = { for s in aws_security_group.this : s.name => s.id }
+  value       = { for s in aws_security_group.this : s.name => s.id }
+  description = "Security group IDs"
 }
 
 output "alb_listener_https_arn" {
-  value = aws_lb_listener.public_https.arn
+  value       = aws_lb_listener.public_https.arn
+  description = "ALB HTTPS listener ARN"
 }

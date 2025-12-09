@@ -14,7 +14,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-##################### METADATA #####################
 variable "namespace" {
   type        = string
   description = "The namespace in which the project is."
@@ -37,12 +36,6 @@ variable "project_name" {
   default     = "network"
 }
 
-variable "project_type" {
-  type        = string
-  description = "The type of project."
-  default     = "infrastructure"
-}
-
 variable "zone_name" {
   type        = string
   description = "The zone associated to this environment. Example : test.yourdomain.com"
@@ -51,4 +44,46 @@ variable "zone_name" {
 variable "subdomain_name" {
   type        = string
   description = "The subdomain that will be prefixed to the zone name to create the final domain name. Example : `iroco2` => iroco2.test.yourdomain.com"
+}
+
+variable "cidr" {
+  description = "The IPv4 CIDR block for the VPC."
+  type        = string
+}
+
+variable "azs" {
+  type = object({
+    eu-west-3 = list(string)
+  })
+  description = "A list of availability zones names or ids in the region"
+  default = {
+    eu-west-3 = ["eu-west-3a", "eu-west-3b"],
+  }
+}
+
+variable "public_subnets" {
+  description = "A list of public subnets inside the VPC"
+  type        = list(string)
+}
+
+variable "private_subnets" {
+  description = "A list of private subnets inside the VPC"
+  type        = list(string)
+}
+
+variable "database_subnets" {
+  description = "A list of database subnets"
+  type        = list(string)
+}
+
+variable "enable_nat_gateway" {
+  description = "Should be true if you want to provision NAT Gateways for each of your private networks"
+  type        = bool
+  default     = false
+}
+
+variable "single_nat_gateway" {
+  description = "Should be true if you want to provision a single shared NAT Gateway across all of your private networks"
+  type        = bool
+  default     = false
 }
