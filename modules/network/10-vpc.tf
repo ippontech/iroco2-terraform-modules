@@ -35,7 +35,7 @@ module "vpc" {
 
   map_public_ip_on_launch = true
 
-  vpc_tags = {
+  tags = {
     Name    = "${var.namespace}-${var.environment}-vpc"
     project = var.project_name
   }
