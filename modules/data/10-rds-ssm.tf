@@ -56,11 +56,19 @@ resource "aws_iam_role" "ssm" {
   name               = "${var.namespace}-${var.environment}-rds-scheduling"
   path               = "/"
   assume_role_policy = data.aws_iam_policy_document.ssm.json
+
+  tags = {
+    project = var.project_name
+  }
 }
 
 resource "aws_iam_policy" "ssm_inline" {
   name   = "${var.namespace}-${var.environment}-ssm-inline"
   policy = data.aws_iam_policy_document.ssm_inline.json
+
+  tags = {
+    project = var.project_name
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "ssm_inline" {
@@ -95,6 +103,10 @@ resource "aws_ssm_association" "start_rds" {
     key    = "ParameterValues"
     values = [local.rds_db_identifier]
   }
+
+  tags = {
+    project = var.project_name
+  }
 }
 
 resource "aws_ssm_association" "stop_rds" {
@@ -118,5 +130,9 @@ resource "aws_ssm_association" "stop_rds" {
   targets {
     key    = "ParameterValues"
     values = [local.rds_db_identifier]
+  }
+
+  tags = {
+    project = var.project_name
   }
 }

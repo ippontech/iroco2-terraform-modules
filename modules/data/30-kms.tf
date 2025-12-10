@@ -14,19 +14,17 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-variable "instance_type" {
-  default     = "t3a.nano"
-  type        = string
-  description = "The instance type for the bastion."
+resource "aws_kms_key" "iroco_identity_provider" {
+  description              = "KMS key for identity provider in IroCO2"
+  key_usage                = "SIGN_VERIFY"
+  customer_master_key_spec = "RSA_4096"
+
+  tags = {
+    project = var.project_name
+  }
 }
 
-variable "bastion_volume_size" {
-  type        = number
-  description = "disk volume size for asg bastion instances"
-  default     = 10
-}
-
-variable "down_recurrence" {
-  type        = string
-  description = "Down Recurrence"
+resource "aws_kms_alias" "alias" {
+  name          = "alias/${var.namespace}-${var.environment}-identity-provider-key"
+  target_key_id = aws_kms_key.iroco_identity_provider.id
 }
