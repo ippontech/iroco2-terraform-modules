@@ -23,7 +23,7 @@ resource "aws_acm_certificate" "certificate" {
     create_before_destroy = true
   }
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }

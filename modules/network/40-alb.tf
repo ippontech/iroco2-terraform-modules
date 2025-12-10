@@ -34,7 +34,7 @@ resource "aws_lb" "public" {
     aws_s3_bucket_policy.lb_logs
   ]
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }
@@ -43,7 +43,7 @@ resource "aws_s3_bucket" "lb_logs" {
   bucket        = "${var.namespace}-${var.environment}-lb-logs"
   force_destroy = true
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }
@@ -89,7 +89,7 @@ resource "aws_lb_listener" "public_http" {
     }
   }
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }
@@ -111,7 +111,7 @@ resource "aws_lb_listener" "public_https" {
     }
   }
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }
@@ -155,7 +155,7 @@ resource "aws_security_group" "alb_public" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }
