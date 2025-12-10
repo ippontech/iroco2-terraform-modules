@@ -28,6 +28,10 @@ resource "aws_ssm_document" "vpcendpoints_create" {
   content = templatefile("${path.module}/template/CreateVpcEndpoints-function.yaml", {
     aws_iam_role_arn = aws_iam_role.ssm.arn
   })
+
+  tags = {
+    project = var.project_name
+  }
 }
 
 resource "aws_ssm_document" "vpcendpoints_delete" {
@@ -38,6 +42,10 @@ resource "aws_ssm_document" "vpcendpoints_delete" {
   content = templatefile("${path.module}/template/DeleteVpcEndpoints-function.yaml", {
     aws_iam_role_arn = aws_iam_role.ssm.arn
   })
+
+  tags = {
+    project = var.project_name
+  }
 }
 
 module "start_endpoint_scheduling_ssm" {
