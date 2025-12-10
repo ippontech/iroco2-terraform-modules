@@ -84,7 +84,7 @@ resource "aws_s3_bucket" "bucket" {
   provider = aws.cloudfront
   bucket   = "${var.namespace}-cloudfront-${var.environment}-bucket"
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }
@@ -187,7 +187,7 @@ resource "aws_cloudfront_distribution" "docs_distribution" {
   }
 
   viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate_validation.example_validation_docs.certificate_arn
+    acm_certificate_arn = aws_acm_certificate_validation.validation_docs.certificate_arn
     ssl_support_method  = "sni-only"
   }
 
@@ -202,7 +202,7 @@ resource "aws_s3_bucket" "docs_bucket" {
   provider = aws.cloudfront
   bucket   = "${var.namespace}-cloudfront-docs-${var.environment}-bucket"
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }

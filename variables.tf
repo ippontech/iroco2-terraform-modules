@@ -79,3 +79,20 @@ variable "single_nat_gateway" {
   type        = bool
   default     = false
 }
+
+## ---------------------- SERVICES ------------------------------
+variable "container_insight_setting_value" {
+  type        = string
+  description = "Container insight value."
+}
+
+variable "capacity_provider" {
+  type        = string
+  description = "Capacity of the provider"
+}
+
+variable "email_addresses" {
+  default     = []
+  type        = list(string)
+  description = "List of email addresses to be used by SES to send emails to Iroco's responsibles"
+}

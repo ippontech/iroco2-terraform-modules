@@ -24,7 +24,7 @@ resource "aws_acm_certificate" "cert" {
     create_before_destroy = true
   }
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }
@@ -64,7 +64,7 @@ resource "aws_acm_certificate" "cert_docs" {
     create_before_destroy = true
   }
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }
@@ -87,13 +87,13 @@ resource "aws_route53_record" "cert_cname_docs" {
   zone_id         = data.aws_route53_zone.selected.zone_id
 }
 
-resource "aws_acm_certificate_validation" "example_validation_docs" {
+resource "aws_acm_certificate_validation" "validation_docs" {
   provider                = aws.cloudfront
   certificate_arn         = aws_acm_certificate.cert_docs.arn
   validation_record_fqdns = [for record in aws_route53_record.cert_cname_docs : record.fqdn]
 }
 
-resource "aws_route53_record" "example_domain_a_docs" {
+resource "aws_route53_record" "domain_a_docs" {
   provider = aws.cloudfront
   zone_id  = data.aws_route53_zone.selected.zone_id
   name     = "docs.${local.domain_name}"

@@ -23,12 +23,12 @@ resource "aws_ecs_cluster" "main" {
     value = var.container_insight_setting_value
   }
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }
 
-resource "aws_ecs_cluster_capacity_providers" "example" {
+resource "aws_ecs_cluster_capacity_providers" "cluster_capacity" {
   cluster_name = aws_ecs_cluster.main.name
 
   capacity_providers = [var.capacity_provider]

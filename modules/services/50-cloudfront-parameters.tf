@@ -20,7 +20,7 @@ resource "aws_ssm_parameter" "cloudfront_bucket_id" {
   type  = "SecureString"
   value = aws_s3_bucket.bucket.id
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }
@@ -30,7 +30,7 @@ resource "aws_ssm_parameter" "cloudfront_distribution_id" {
   type  = "SecureString"
   value = aws_cloudfront_distribution.s3_distribution.id
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }
@@ -41,7 +41,7 @@ resource "aws_ssm_parameter" "docs_cloudfront_bucket_id" {
   type  = "SecureString"
   value = aws_s3_bucket.docs_bucket.id
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }
@@ -51,7 +51,7 @@ resource "aws_ssm_parameter" "docs_cloudfront_distribution_id" {
   type  = "SecureString"
   value = aws_cloudfront_distribution.docs_distribution.id
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }
