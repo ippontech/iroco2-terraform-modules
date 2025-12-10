@@ -14,7 +14,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-## ---------------------- GLOBAL -------------------------------
+##################### METADATA #####################
 variable "namespace" {
   type        = string
   description = "The namespace in which the project is."
@@ -26,78 +26,11 @@ variable "environment" {
   description = "The name of the environment we are deploying to"
 }
 
-variable "aws_region" {
+variable "project_name" {
   type        = string
-  description = "The AWS region to deploy to (already in backend config but we need it for null resource)"
+  description = "Project's name"
 }
 
-variable "project_type" {
-  type        = string
-  description = "The type of project."
-  default     = "infrastructure"
-}
-
-## ---------------------- NETWORK ------------------------------
-variable "cidr" {
-  description = "The IPv4 CIDR block for the VPC."
-  type        = string
-}
-
-variable "public_subnets" {
-  description = "A list of public subnets inside the VPC"
-  type        = list(string)
-}
-
-variable "private_subnets" {
-  description = "A list of private subnets inside the VPC"
-  type        = list(string)
-}
-
-variable "database_subnets" {
-  description = "A list of database subnets"
-  type        = list(string)
-}
-
-variable "zone_name" {
-  type        = string
-  description = "The zone associated to this environment. Example : test.yourdomain.com"
-}
-
-variable "subdomain_name" {
-  type        = string
-  description = "The subdomain that will be prefixed to the zone name to create the final domain name. Example : `iroco2` => iroco2.test.yourdomain.com"
-}
-
-variable "enable_nat_gateway" {
-  description = "Should be true if you want to provision NAT Gateways for each of your private networks"
-  type        = bool
-  default     = false
-}
-
-variable "single_nat_gateway" {
-  description = "Should be true if you want to provision a single shared NAT Gateway across all of your private networks"
-  type        = bool
-  default     = false
-}
-
-## ---------------------- SERVICES ------------------------------
-variable "container_insight_setting_value" {
-  type        = string
-  description = "Container insight value."
-}
-
-variable "capacity_provider" {
-  type        = string
-  description = "Capacity of the provider"
-}
-
-variable "email_addresses" {
-  default     = []
-  type        = list(string)
-  description = "List of email addresses to be used by SES to send emails to Iroco's responsibles"
-}
-
-## ---------------------- DATA ------------------------------
 variable "rds_instance_name" {
   type        = string
   description = "The AWS RDS DB instance name for irocalc."
@@ -148,6 +81,16 @@ variable "rds_database_name" {
   description = "RDS's name"
 }
 
+variable "rds_security_group_id" {
+  type        = string
+  description = "The security group id to use for the RDS."
+}
+
+variable "rds_database_subnets_ids" {
+  type        = list(string)
+  description = "The database subnets ids."
+}
+
 variable "create_bastion" {
   type        = bool
   description = "If the bastion should be created."
@@ -157,6 +100,16 @@ variable "instance_type" {
   default     = "t3a.nano"
   type        = string
   description = "The instance type for the bastion."
+}
+
+variable "bastion_security_group_id" {
+  type        = string
+  description = "The security group id to use for the bastion."
+}
+
+variable "private_subnet_ids" {
+  type        = list(string)
+  description = "The private subnets ids."
 }
 
 variable "bastion_volume_size" {

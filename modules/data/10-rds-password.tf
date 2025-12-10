@@ -32,6 +32,10 @@ resource "random_password" "rds_master_pass" {
 # The secret
 resource "aws_secretsmanager_secret" "rds_master_pass" {
   name = "${var.namespace}/${var.environment}/rds/master-password-irocalc-db-secret"
+
+  tags = {
+    project = var.project_name
+  }
 }
 
 # Initial version

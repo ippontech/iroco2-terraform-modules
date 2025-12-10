@@ -46,8 +46,8 @@ module "rds" {
 
   # Network
   port                   = var.rds_database_port
-  vpc_security_group_ids = [data.terraform_remote_state.network.outputs.security_group_ids["${var.namespace}-${var.environment}-iroco-database"], aws_security_group.rds.id]
-  subnet_ids             = data.terraform_remote_state.network.outputs.database_subnets_ids
+  vpc_security_group_ids = [var.rds_security_group_id]
+  subnet_ids             = var.rds_database_subnets_ids
   create_db_subnet_group = true
 
   # Maintenance
@@ -69,22 +69,8 @@ module "rds" {
   apply_immediately   = true
 
   parameters = var.rds_database_engine == "postgres" ? [{ name = "rds.force_ssl", value = "1" }] : []
-}
 
-resource "aws_security_group" "rds" {
-  name   = local.rds_db_identifier
-  vpc_id = data.terraform_remote_state.network.outputs.vpc_id
-
-  ingress {
-    from_port   = var.rds_database_port
-    to_port     = var.rds_database_port
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.0.128/26", "10.0.0.192/26"]
-  }
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    cidr_blocks = ["0.0.0.0/0"]
+  tags = {
+    project = var.project_name
   }
 }

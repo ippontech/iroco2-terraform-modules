@@ -14,11 +14,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-data "aws_caller_identity" "this" {}
-
 resource "aws_kms_key" "rds" {
   description = "Key used to encrypt RDS ${var.namespace}"
   policy      = data.aws_iam_policy_document.kms_key_policy.json
+
+  tags = {
+    project = var.project_name
+  }
 }
 
 resource "aws_kms_alias" "rds" {

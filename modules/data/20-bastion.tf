@@ -17,20 +17,22 @@
 locals {
   instance_name = "${var.namespace}-${var.environment}-bastion-al23"
   asg_tags = {
-    "Name"        = "${var.namespace}-bastion-al23"
+    "Name"        = "${var.namespace}-${var.environment}-bastion-al23"
     "Description" = "Bastion based on ${data.aws_ami.amazon_linux_3.name} but encrypted and using SSM capabilities"
   }
 }
 
 resource "aws_launch_template" "bastion_launch_template" {
+  count = var.create_bastion ? 1 : 0
+
   name = local.instance_name
   iam_instance_profile {
-    arn = module.instance_profile_role.this_iam_instance_profile_arn
+    arn = module.instance_profile_role[0].iam_instance_profile_arn
   }
-  image_id                             = aws_ami_copy.amazon_linux_3_encrypted.id
+  image_id                             = aws_ami_copy.amazon_linux_3_encrypted[0].id
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = var.instance_type
-  vpc_security_group_ids               = [data.terraform_remote_state.network.outputs.security_group_ids["${var.namespace}-${var.environment}-bastion"]]
+  vpc_security_group_ids               = [var.bastion_security_group_id]
 
   block_device_mappings {
     device_name = "/dev/xvda"
@@ -43,19 +45,25 @@ resource "aws_launch_template" "bastion_launch_template" {
       encrypted             = true
     }
   }
+
+  tags = {
+    project = var.project_name
+  }
 }
 
 resource "aws_autoscaling_group" "asg" {
+  count = var.create_bastion ? 1 : 0
+
   name                      = "${local.instance_name}-asg"
   min_size                  = 1
   max_size                  = 1
-  force_delete              = false
-  vpc_zone_identifier       = data.terraform_remote_state.network.outputs.private_subnet_ids
+  force_delete              = true
+  vpc_zone_identifier       = var.private_subnet_ids
   health_check_grace_period = 300
   health_check_type         = "EC2"
   termination_policies      = ["OldestInstance"]
   launch_template {
-    id      = aws_launch_template.bastion_launch_template.id
+    id      = aws_launch_template.bastion_launch_template[0].id
     version = "$Latest"
   }
 
@@ -77,10 +85,12 @@ resource "aws_autoscaling_group" "asg" {
 
 # scheduling
 resource "aws_autoscaling_schedule" "schedule_work_hours_down" {
+  count = var.create_bastion ? 1 : 0
+
   scheduled_action_name  = "schedule_work_hours_down"
   min_size               = 0
   max_size               = 0
   desired_capacity       = 0
-  autoscaling_group_name = aws_autoscaling_group.asg.name
+  autoscaling_group_name = aws_autoscaling_group.asg[0].name
   recurrence             = var.down_recurrence
 }
