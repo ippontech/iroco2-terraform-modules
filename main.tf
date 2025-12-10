@@ -54,4 +54,6 @@ module "data" {
   rds_backup_retention_period = var.rds_backup_retention_period
   rds_deletion_protection     = var.rds_deletion_protection
   rds_is_multi_az             = var.rds_is_multi_az
+
+  depends_on = [module.network]
 }
