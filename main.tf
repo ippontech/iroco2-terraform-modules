@@ -1,8 +1,9 @@
 module "network" {
   source = "./modules/network"
 
-  environment = var.environment
-  aws_region  = var.aws_region
+  project_name = "network"
+  environment  = var.environment
+  aws_region   = var.aws_region
 
   cidr             = var.cidr
   private_subnets  = var.private_subnets
@@ -15,12 +16,17 @@ module "network" {
 module "services" {
   source = "./modules/services"
 
-  environment = var.environment
-  aws_region  = var.aws_region
+  project_name = "services"
+  environment  = var.environment
 
   container_insight_setting_value = var.container_insight_setting_value
   capacity_provider               = var.capacity_provider
   subdomain_name                  = var.subdomain_name
   zone_name                       = var.zone_name
   email_addresses                 = var.email_addresses
+
+  providers = {
+    aws            = aws
+    aws.cloudfront = aws.cloudfront
+  }
 }

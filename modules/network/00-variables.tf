@@ -33,7 +33,6 @@ variable "aws_region" {
 variable "project_name" {
   type        = string
   description = "Project's name"
-  default     = "network"
 }
 
 variable "zone_name" {

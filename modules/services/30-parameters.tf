@@ -25,7 +25,7 @@ resource "aws_ssm_parameter" "parameters_list" {
     ignore_changes = [value]
   }
 
-  tags_all = {
+  tags = {
     project = var.project_name
   }
 }

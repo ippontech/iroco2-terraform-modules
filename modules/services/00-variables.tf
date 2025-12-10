@@ -28,13 +28,6 @@ variable "environment" {
 variable "project_name" {
   type        = string
   description = "Project's name"
-  default     = "services"
-}
-
-variable "project_type" {
-  type        = string
-  description = "The type of project."
-  default     = "infrastructure"
 }
 
 variable "zone_name" {
