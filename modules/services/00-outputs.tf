@@ -14,4 +14,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# 
+output "cluster" {
+  value       = aws_ecs_cluster.main
+  description = "ECS cluster name"
+}

@@ -14,6 +14,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-output "iroco_identity_provider_key_id" {
-  value = aws_kms_alias.alias
+data "aws_route53_zone" "main" {
+  name = var.route53_zone
+}
+
+data "aws_kms_alias" "secrets_manager" {
+  name = "alias/aws/secretsmanager"
 }

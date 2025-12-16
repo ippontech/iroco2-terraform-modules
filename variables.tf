@@ -169,3 +169,39 @@ variable "down_recurrence" {
   type        = string
   description = "Down Recurrence"
 }
+
+## ---------------------- ECS TASK ------------------------------
+variable "container_cpu" {
+  type        = number
+  description = "The number of CPU units to reserve for the container"
+}
+
+variable "container_memory" {
+  type        = number
+  description = "The amount of memory to reserve for the container"
+}
+
+variable "container_image" {
+  type        = string
+  description = "The image to use for the container"
+}
+
+variable "container_port" {
+  type    = number
+  default = 8080
+
+  validation {
+    condition     = var.container_port > 0 && var.container_port <= 65536
+    error_message = "The port should be between 0 and 65536."
+  }
+}
+
+variable "container_desired_count" {
+  type    = number
+  default = 1
+
+  validation {
+    condition     = var.container_desired_count >= 1
+    error_message = "You should have at least one instance running."
+  }
+}

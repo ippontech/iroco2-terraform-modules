@@ -38,3 +38,18 @@ output "alb_listener_https_arn" {
   value       = aws_lb_listener.public_https.arn
   description = "ALB HTTPS listener ARN"
 }
+
+output "alb_dns_name" {
+  value       = aws_lb.public.dns_name
+  description = "ALB DNS name"
+}
+
+output "alb_zone_id" {
+  value       = aws_lb.public.zone_id
+  description = "ALB zone ID"
+}
+
+output "alb_arn_suffix" {
+  value       = aws_lb.public.arn_suffix
+  description = "ALB ARN suffix"
+}
