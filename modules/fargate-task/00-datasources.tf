@@ -14,8 +14,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-## ---------------------- NETWORK ------------------------------
-output "network_outputs" {
-  value       = module.network
-  description = "Network module outputs"
+data "aws_route53_zone" "main" {
+  name = var.zone_name
+}
+
+data "aws_kms_alias" "secrets_manager" {
+  name = "alias/aws/secretsmanager"
 }

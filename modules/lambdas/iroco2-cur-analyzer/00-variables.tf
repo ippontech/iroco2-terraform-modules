@@ -13,9 +13,24 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
+variable "namespace" {
+  type        = string
+  description = "The namespace in which the project is."
+  default     = "iroco2"
+}
 
-## ---------------------- NETWORK ------------------------------
-output "network_outputs" {
-  value       = module.network
-  description = "Network module outputs"
+variable "environment" {
+  type        = string
+  description = "The name of the environment we are deploying to"
+}
+
+variable "project_name" {
+  type        = string
+  description = "Project's name"
+  default     = "cur"
+}
+
+variable "front_domain_name" {
+  type        = string
+  description = "The name of the front. Used for S3 CORS configuration"
 }

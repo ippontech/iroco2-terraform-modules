@@ -13,9 +13,5 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-
-## ---------------------- NETWORK ------------------------------
-output "network_outputs" {
-  value       = module.network
-  description = "Network module outputs"
-}
+class InputValidationError(Exception):
+    pass

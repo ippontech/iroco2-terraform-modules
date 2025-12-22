@@ -14,8 +14,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-## ---------------------- NETWORK ------------------------------
-output "network_outputs" {
-  value       = module.network
-  description = "Network module outputs"
+resource "aws_route53_record" "alb_public" {
+  zone_id = data.aws_route53_zone.main.id
+  name    = "api.${local.domain_name}"
+  type    = "A"
+  alias {
+    name                   = var.alb_dns_name
+    zone_id                = var.alb_zone_id
+    evaluate_target_health = false
+  }
 }

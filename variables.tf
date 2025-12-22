@@ -80,6 +80,11 @@ variable "single_nat_gateway" {
   default     = false
 }
 
+variable "cors_allowed_origins" {
+  type        = string
+  description = "List of allowed origins for CORS"
+}
+
 ## ---------------------- SERVICES ------------------------------
 variable "container_insight_setting_value" {
   type        = string
@@ -168,4 +173,45 @@ variable "bastion_volume_size" {
 variable "down_recurrence" {
   type        = string
   description = "Down Recurrence"
+}
+
+variable "up_recurrence" {
+  type        = string
+  description = "Up Recurrence"
+}
+
+## ---------------------- ECS TASK ------------------------------
+variable "container_cpu" {
+  type        = number
+  description = "The number of CPU units to reserve for the container"
+}
+
+variable "container_memory" {
+  type        = number
+  description = "The amount of memory to reserve for the container"
+}
+
+variable "container_image" {
+  type        = string
+  description = "The image to use for the container"
+}
+
+variable "container_port" {
+  type    = number
+  default = 8080
+
+  validation {
+    condition     = var.container_port > 0 && var.container_port <= 65536
+    error_message = "The port should be between 0 and 65536."
+  }
+}
+
+variable "container_desired_count" {
+  type    = number
+  default = 1
+
+  validation {
+    condition     = var.container_desired_count >= 1
+    error_message = "You should have at least one instance running."
+  }
 }

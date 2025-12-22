@@ -13,9 +13,21 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
+import os
+import boto3
 
-## ---------------------- NETWORK ------------------------------
-output "network_outputs" {
-  value       = module.network
-  description = "Network module outputs"
-}
+
+class SQSRepository:
+    def __init__(self):
+        self.sqs_client = boto3.client(
+            'sqs',        
+            region_name=os.environ.get('REGION')                
+        )
+
+    def send_message(self, queue_url: str, message_body: str):
+    
+        response = self.sqs_client.send_message(
+            QueueUrl=queue_url,
+            MessageBody=message_body
+        )
+        return response

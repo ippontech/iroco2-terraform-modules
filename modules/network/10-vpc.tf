@@ -22,10 +22,13 @@ module "vpc" {
 
   cidr = var.cidr
 
-  azs              = var.azs[data.aws_region.this.name]
-  public_subnets   = var.public_subnets
-  private_subnets  = var.private_subnets
-  database_subnets = var.database_subnets
+  azs                   = var.azs[data.aws_region.this.name]
+  public_subnets        = var.public_subnets
+  public_subnet_names   = [for az in var.azs[var.aws_region] : "${var.namespace}-${var.environment}-public-subnet-${az}"]
+  private_subnets       = var.private_subnets
+  private_subnet_names  = [for az in var.azs[var.aws_region] : "${var.namespace}-${var.environment}-private-subnet-${az}"]
+  database_subnets      = var.database_subnets
+  database_subnet_names = [for az in var.azs[var.aws_region] : "${var.namespace}-${var.environment}-database-subnet-${az}"]
 
   enable_nat_gateway = var.enable_nat_gateway
   single_nat_gateway = var.single_nat_gateway

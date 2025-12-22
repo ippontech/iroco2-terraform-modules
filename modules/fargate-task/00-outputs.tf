@@ -14,8 +14,22 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-## ---------------------- NETWORK ------------------------------
-output "network_outputs" {
-  value       = module.network
-  description = "Network module outputs"
+output "ecs_task_definition" {
+  value       = aws_ecs_task_definition.api
+  description = "ECS task definition"
+}
+
+output "ecs_service" {
+  value       = aws_ecs_service.main
+  description = "ECS service"
+}
+
+output "alb_target_group" {
+  value       = aws_lb_target_group.api
+  description = "ALB target group"
+}
+
+output "alb_listener_rule" {
+  value       = aws_lb_listener_rule.api
+  description = "ALB listener rule"
 }

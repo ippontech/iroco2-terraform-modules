@@ -15,5 +15,21 @@
 # SPDX-License-Identifier: Apache-2.0
 
 output "iroco_identity_provider_key_id" {
-  value = aws_kms_alias.alias.id
+  value       = aws_kms_alias.alias
+  description = "The key id of the identity provider"
+}
+
+output "rds_database" {
+  value = {
+    db_instance_arn      = module.rds.db_instance_arn
+    db_instance_endpoint = module.rds.db_instance_endpoint
+    db_instance_name     = module.rds.db_instance_name
+    db_instance_port     = module.rds.db_instance_port
+  }
+  description = "The RDS database informations"
+}
+
+output "rds_database_secret_arn" {
+  value       = aws_secretsmanager_secret.rds_master_pass.arn
+  description = "The ARN of the secret containing the RDS master password"
 }

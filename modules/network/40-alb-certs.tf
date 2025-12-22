@@ -16,7 +16,7 @@
 
 # Creates a wildcard certificate, valid for *.<environment_domain>
 resource "aws_acm_certificate" "certificate" {
-  domain_name       = "api.${local.domain_name}"
+  domain_name       = "*.${local.domain_name}"
   validation_method = "DNS"
 
   lifecycle {

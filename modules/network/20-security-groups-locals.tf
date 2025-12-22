@@ -83,6 +83,18 @@ locals {
       port          = 443
       protocol      = "tcp"
       referenced_sg = "vpce_kms"
+    }],
+    vpce_secrets_manager = [{
+      description   = "Allow communication to VPC endpoint Secrets Manager"
+      port          = 443
+      protocol      = "tcp"
+      referenced_sg = "vpce_secrets_manager"
+    }],
+    vpce_sqs = [{
+      description   = "Allow communication to VPC endpoint SQS"
+      port          = 443
+      protocol      = "tcp"
+      referenced_sg = "vpce_sqs"
     }]
   }
 
@@ -127,6 +139,8 @@ locals {
         local.common_egress_rules.vpce_ecr,
         local.common_egress_rules.vpce_ssm,
         local.common_egress_rules.vpce_kms,
+        local.common_egress_rules.vpce_secrets_manager,
+        local.common_egress_rules.vpce_sqs,
         [
           {
             description = "Allow pulling image from ECR through S3",
