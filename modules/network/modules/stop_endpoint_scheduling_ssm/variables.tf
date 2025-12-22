@@ -30,3 +30,14 @@ variable "working_days" {
   type        = list(string)
   description = "The list of working days"
 }
+
+variable "namespace" {
+  type        = string
+  description = "The namespace in which the project is."
+  default     = "iroco2"
+}
+
+variable "environment" {
+  type        = string
+  description = "The name of the environment we are deploying to"
+}

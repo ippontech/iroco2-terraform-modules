@@ -27,7 +27,9 @@ resource "aws_ssm_association" "delete_vpc_endpoints" {
   schedule_expression = "cron(15 18 ? * ${each.value} *)" #GMT -> 8:15 PM in Paris
 
   parameters = {
-    tagname = var.tag_autoshutdown
+    tagname     = var.tag_autoshutdown
+    environment = var.environment
+    namespace   = var.namespace
   }
 
   automation_target_parameter_name = "tagname"

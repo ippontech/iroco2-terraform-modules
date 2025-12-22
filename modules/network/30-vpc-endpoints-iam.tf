@@ -49,6 +49,8 @@ data "aws_iam_policy_document" "ssm_inline" {
 }
 
 resource "aws_iam_role" "ssm" {
+  count = var.create_vpc_endpoints ? 1 : 0
+
   name               = "${var.namespace}-${var.environment}-vpc-endpoints-scheduling"
   path               = "/"
   assume_role_policy = data.aws_iam_policy_document.ssm.json
@@ -56,13 +58,17 @@ resource "aws_iam_role" "ssm" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssm_automation" {
-  role       = aws_iam_role.ssm.name
+  count = var.create_vpc_endpoints ? 1 : 0
+
+  role       = aws_iam_role.ssm[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
 }
 
 
 resource "aws_iam_role_policy" "ssm" {
+  count = var.create_vpc_endpoints ? 1 : 0
+
   name   = "${var.namespace}-${var.environment}-ssm-inline"
   policy = data.aws_iam_policy_document.ssm_inline.json
-  role   = aws_iam_role.ssm.id
+  role   = aws_iam_role.ssm[0].id
 }

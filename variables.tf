@@ -85,6 +85,17 @@ variable "cors_allowed_origins" {
   description = "List of allowed origins for CORS"
 }
 
+# Whether to create VPC endpoints (Interface endpoints) in the VPC. Our setup is using SSM documents in order to be:
+# - Better FinOps, as it's cheaper than a NAT Gateway (when scheduled for work hours)
+# - Better security, as it's using private endpoints instead of public ones
+# But be careful, SSM documents deploying VPC endpoints means:
+# - Trigger manually the SSM document to create VPC endpoints the first time you deploy the stack, or wait for the first time the SSM document is triggered by the schedule
+# - Be sure to have an ECR repository with the images for backend service + keycloak
+variable "create_vpc_endpoints" {
+  description = "Controls if VPC Endpoints configuration should be created"
+  type        = bool
+}
+
 ## ---------------------- SERVICES ------------------------------
 variable "container_insight_setting_value" {
   type        = string
