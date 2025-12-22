@@ -13,9 +13,13 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
+resource "aws_cloudwatch_log_group" "lambda_log_group" {
+  name              = "/aws/lambda/${local.lambda.function_name}"
+  retention_in_days = 1
+}
 
-## ---------------------- NETWORK ------------------------------
-output "network_outputs" {
-  value       = module.network
-  description = "Network module outputs"
+resource "aws_iam_role_policy" "lambda_log" {
+  name   = "${var.namespace}-${var.environment}-${var.project_name}-lambda-logs-policy"
+  role   = aws_iam_role.lambda_role_send.id
+  policy = data.aws_iam_policy_document.log_cloud.json
 }

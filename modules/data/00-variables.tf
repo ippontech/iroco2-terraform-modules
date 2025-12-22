@@ -122,3 +122,8 @@ variable "down_recurrence" {
   type        = string
   description = "Down Recurrence"
 }
+
+variable "up_recurrence" {
+  type        = string
+  description = "Up Recurrence"
+}

@@ -68,7 +68,7 @@ module "rds" {
   deletion_protection = var.rds_deletion_protection
   apply_immediately   = true
 
-  parameters = var.rds_database_engine == "postgres" ? [{ name = "rds.force_ssl", value = "1" }] : []
+  parameters = var.rds_database_engine == "postgres" ? [{ name = "rds.force_ssl", value = "1", apply_method = "pending-reboot" }] : []
 
   tags = {
     project = var.project_name

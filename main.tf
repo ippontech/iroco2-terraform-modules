@@ -5,12 +5,14 @@ module "network" {
   environment  = var.environment
   aws_region   = var.aws_region
 
-  cidr             = var.cidr
-  private_subnets  = var.private_subnets
-  public_subnets   = var.public_subnets
-  database_subnets = var.database_subnets
-  subdomain_name   = var.subdomain_name
-  zone_name        = var.zone_name
+  cidr               = var.cidr
+  private_subnets    = var.private_subnets
+  public_subnets     = var.public_subnets
+  database_subnets   = var.database_subnets
+  subdomain_name     = var.subdomain_name
+  zone_name          = var.zone_name
+  enable_nat_gateway = var.enable_nat_gateway
+  single_nat_gateway = var.single_nat_gateway
 }
 
 module "services" {
@@ -39,6 +41,7 @@ module "data" {
 
   create_bastion            = var.create_bastion
   down_recurrence           = var.down_recurrence
+  up_recurrence             = var.up_recurrence
   private_subnet_ids        = module.network.private_subnet_ids
   bastion_security_group_id = module.network.security_group_ids["iroco2-${var.environment}-bastion"]
 
@@ -58,19 +61,22 @@ module "data" {
   depends_on = [module.network]
 }
 
-locals {
-  database_name      = "irocalc"
-  cur_s3_bucket_name = "cur-${var.namespace}-${var.environment}"
+module "lambda_cur" {
+  source = "./modules/lambdas/iroco2-cur-analyzer"
+
+  environment       = var.environment
+  project_name      = "cur"
+  front_domain_name = "${var.subdomain_name}.${var.zone_name}"
 }
 
-module "api-fargate" {
+module "backend_api" {
   source = "./modules/fargate-task"
 
   # Global variables
   aws_region        = var.aws_region
   project_name      = "irocalc-backend"
   environment       = var.environment
-  cur_s3_bucket_arn = ""
+  cur_s3_bucket_arn = module.lambda_cur.s3_cur_bucket_arn
 
   # Network variables
   vpc_id                = module.network.vpc_id
@@ -79,57 +85,57 @@ module "api-fargate" {
   alb_zone_id           = module.network.alb_zone_id
   alb_arn_suffix        = module.network.alb_arn_suffix
   alb_listener_arn      = module.network.alb_listener_https_arn
-  route53_zone          = var.route53_zone
   alb_security_group_id = module.network.security_group_ids["iroco2-${var.environment}-alb"]
-  subdomain_name        = ""
-  zone_name             = ""
+  subdomain_name        = var.subdomain_name
+  zone_name             = var.zone_name
 
   # ECS variables
-  cluster_name            = module.services.cluster.name
-  cluster_id              = module.services.cluster.id
-  container_cpu           = var.container_cpu
-  container_memory        = var.container_memory
-  container_port          = var.container_port
-  container_image         = var.container_image
-  container_desired_count = var.container_desired_count
-  kms_identity_key_arn    = module.data.iroco_identity_provider_key_id.arn
+  cluster_name                  = module.services.cluster.name
+  cluster_id                    = module.services.cluster.id
+  container_cpu                 = var.container_cpu
+  container_memory              = var.container_memory
+  container_port                = var.container_port
+  container_image               = var.container_image
+  container_desired_count       = var.container_desired_count
+  kms_identity_key_arn          = data.aws_kms_key.signing_key.arn
+  ecs_backend_security_group_id = module.network.security_group_ids["iroco2-${var.environment}-iroco-backend"]
 
   task_container_environment = {
-    DATABASE_NAME                      = local.database_name,
+    DATABASE_NAME                      = module.data.rds_database.db_instance_name
     IROCO2_CORS_ALLOWED_ORIGINS        = var.cors_allowed_origins
-    IROCO2_AWS_ANALYZER_SQS_QUEUE_NAME = data.aws_sqs_queue.analyzer_sqs_cur.name
-    IROCO2_AWS_SCANNER_SQS_QUEUE_NAME  = data.aws_sqs_queue.scanner_sqs_cur.name
-    IROCO2_AWS_SQS_QUEUE_ENDPOINT      = trimsuffix(data.aws_sqs_queue.analyzer_sqs_cur.url, data.aws_sqs_queue.analyzer_sqs_cur.name)
-    S3_BUCKET_NAME                     = local.cur_s3_bucket_name
-    IROCO2_AWS_REGION_STATIC           = var.region
-    IROCO2_CLERK_ISSUER                = data.aws_ssm_parameter.clerk_issuer.value
-    IROCO2_CLERK_AUDIENCE              = data.aws_ssm_parameter.clerk_audience.value
-    IROCO2_CLERK_PUBLIC_KEY            = data.aws_ssm_parameter.clerk_public_key.value
-    IROCO2_KMS_IDENTITY_KEY_ID         = data.terraform_remote_state.data.outputs.iroco_identity_provider_key_id
+    IROCO2_AWS_ANALYZER_SQS_QUEUE_NAME = module.lambda_cur.analyzer_sqs_cur_name
+    IROCO2_AWS_SCANNER_SQS_QUEUE_NAME  = module.lambda_cur.scanner_sqs_cur_name
+    IROCO2_AWS_SQS_QUEUE_ENDPOINT      = trimsuffix(module.lambda_cur.analyzer_sqs_cur_url, module.lambda_cur.analyzer_sqs_cur_name)
+    S3_BUCKET_NAME                     = module.lambda_cur.s3_cur_bucket_id
+    IROCO2_AWS_REGION_STATIC           = var.aws_region
+    IROCO2_CLERK_ISSUER                = module.services.ssm_parameters["clerk_issuer"].value
+    IROCO2_CLERK_AUDIENCE              = module.services.ssm_parameters["clerk_audience"].value
+    IROCO2_CLERK_PUBLIC_KEY            = module.services.ssm_parameters["clerk_public_key"].value
+    IROCO2_KMS_IDENTITY_KEY_ID         = module.data.iroco_identity_provider_key_id.id
     IROCO2_KMS_IDENTITY_PUBLIC_KEY     = data.aws_kms_public_key.by_id.public_key
-    JWT_ISSUER                         = var.route53_zone[var.environment]
-    JWT_AUDIENCE                       = var.route53_zone[var.environment]
+    JWT_ISSUER                         = var.zone_name
+    JWT_AUDIENCE                       = var.zone_name
   }
   task_container_secrets_arn = {}
   task_container_secrets_arn_with_key = {
     IROCO2_DATA_SOURCE_URL = {
-      arn = data.aws_secretsmanager_secret.rds_credentials.arn
+      arn = module.data.rds_database_secret_arn
       key = "host"
     }
     IROCO2_DATA_SOURCE_USERNAME = {
-      arn = data.aws_secretsmanager_secret.rds_credentials.arn
+      arn = module.data.rds_database_secret_arn
       key = "username"
     }
     IROCO2_DATA_SOURCE_PASSWORD = {
-      arn = data.aws_secretsmanager_secret.rds_credentials.arn
+      arn = module.data.rds_database_secret_arn
       key = "password"
     }
     IROCO2_DATA_SOURCE_FLYWAY_USERNAME = {
-      arn = data.aws_secretsmanager_secret.rds_credentials.arn
+      arn = module.data.rds_database_secret_arn
       key = "username"
     }
     IROCO2_DATA_SOURCE_FLYWAY_PASSWORD = {
-      arn = data.aws_secretsmanager_secret.rds_credentials.arn
+      arn = module.data.rds_database_secret_arn
       key = "password"
     }
   }

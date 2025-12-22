@@ -21,7 +21,14 @@ variable "project_name" {
 }
 
 variable "environment" {
-  type = string
+  type        = string
+  description = "The environment to deploy to"
+}
+
+variable "namespace" {
+  type        = string
+  description = "The namespace in which the project is."
+  default     = "iroco2"
 }
 
 variable "aws_region" {
@@ -74,6 +81,11 @@ variable "alb_security_group_id" {
   description = "The security group id of the ALB"
 }
 
+variable "ecs_backend_security_group_id" {
+  type        = string
+  description = "The security group id of the ECS backend"
+}
+
 variable "zone_name" {
   type        = string
   description = "The zone associated to this environment. Example : test.yourdomain.com"
@@ -102,11 +114,6 @@ variable "alb_arn_suffix" {
 variable "alb_listener_arn" {
   type        = string
   description = "ALB listener ARN"
-}
-
-variable "route53_zone" {
-  type        = string
-  description = "Route53 zone to create the DNS record in"
 }
 
 #### CONTAINER ####

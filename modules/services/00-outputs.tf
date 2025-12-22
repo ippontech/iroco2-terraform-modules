@@ -18,3 +18,8 @@ output "cluster" {
   value       = aws_ecs_cluster.main
   description = "ECS cluster name"
 }
+
+output "ssm_parameters" {
+  value       = aws_ssm_parameter.parameters_list
+  description = "List of SSM parameters"
+}

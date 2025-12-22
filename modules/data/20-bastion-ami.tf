@@ -28,16 +28,16 @@ data "aws_ami" "amazon_linux_3" {
   }
 }
 
-resource "aws_ami_copy" "amazon_linux_3_encrypted" {
-  count = var.create_bastion ? 1 : 0
-
-  name              = "${var.namespace}-${var.environment}-bastion-${data.aws_ami.amazon_linux_3.name}-encrypted-temp"
-  description       = "A copy of ${data.aws_ami.amazon_linux_3.description} but encrypted"
-  source_ami_id     = data.aws_ami.amazon_linux_3.id
-  source_ami_region = data.aws_region.current.name
-  encrypted         = true
-  tags = {
-    image-type = "encrypted-al3-linux"
-    project    = var.project_name
-  }
-}
+# resource "aws_ami_copy" "amazon_linux_3_encrypted" {
+#   count = var.create_bastion ? 1 : 0
+#
+#   name              = "${var.namespace}-${var.environment}-bastion-${data.aws_ami.amazon_linux_3.name}-encrypted-temp"
+#   description       = "A copy of ${data.aws_ami.amazon_linux_3.description} but encrypted"
+#   source_ami_id     = data.aws_ami.amazon_linux_3.id
+#   source_ami_region = data.aws_region.current.name
+#   encrypted         = true
+#   tags = {
+#     image-type = "encrypted-al3-linux"
+#     project    = var.project_name
+#   }
+# }

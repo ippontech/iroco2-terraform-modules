@@ -15,7 +15,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 data "aws_route53_zone" "main" {
-  name = var.route53_zone
+  name = var.zone_name
 }
 
 data "aws_kms_alias" "secrets_manager" {

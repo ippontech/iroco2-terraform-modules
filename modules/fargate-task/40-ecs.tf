@@ -83,39 +83,13 @@ resource "aws_ecs_service" "main" {
 
   network_configuration {
     subnets         = var.private_subnet_ids
-    security_groups = [aws_security_group.service.id]
+    security_groups = [var.ecs_backend_security_group_id]
   }
 
   depends_on = [
     aws_iam_policy.service,
     aws_cloudwatch_log_group.app_logs
   ]
-
-  tags = {
-    project = var.project_name
-  }
-}
-
-resource "aws_security_group" "service" {
-  name        = "${var.namespace}-${var.environment}-${var.project_name}-service"
-  description = "Allow HTTP inbound traffic"
-  vpc_id      = var.vpc_id
-
-  ingress {
-    from_port = var.container_port
-    to_port   = var.container_port
-    protocol  = "tcp"
-    security_groups = [
-      var.alb_security_group_id
-    ]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   tags = {
     project = var.project_name

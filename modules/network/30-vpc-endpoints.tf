@@ -58,7 +58,7 @@ module "start_endpoint_scheduling_ssm" {
   vpc_id          = module.vpc.vpc_id
   SecurityGroupId = try(each.value.security_group_id, null) != null ? each.value.security_group_id : null
   RouteTableIds   = module.vpc.private_route_table_ids
-  SubnetIds       = [module.vpc.private_subnets[0]]
+  SubnetIds       = module.vpc.private_subnets
 
   tag_autoshutdown = var.tag_autoshutdown
   namespace        = var.namespace

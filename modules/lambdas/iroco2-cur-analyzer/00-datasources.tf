@@ -13,9 +13,6 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
+data "aws_region" "current" {}
 
-## ---------------------- NETWORK ------------------------------
-output "network_outputs" {
-  value       = module.network
-  description = "Network module outputs"
-}
+data "aws_caller_identity" "current" {}

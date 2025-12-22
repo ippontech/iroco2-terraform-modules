@@ -29,7 +29,7 @@ resource "aws_launch_template" "bastion_launch_template" {
   iam_instance_profile {
     arn = module.instance_profile_role[0].iam_instance_profile_arn
   }
-  image_id                             = aws_ami_copy.amazon_linux_3_encrypted[0].id
+  image_id                             = data.aws_ami.amazon_linux_3.id
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = var.instance_type
   vpc_security_group_ids               = [var.bastion_security_group_id]
@@ -93,4 +93,16 @@ resource "aws_autoscaling_schedule" "schedule_work_hours_down" {
   desired_capacity       = 0
   autoscaling_group_name = aws_autoscaling_group.asg[0].name
   recurrence             = var.down_recurrence
+}
+
+# scheduling
+resource "aws_autoscaling_schedule" "schedule_work_hours_up" {
+  count = var.create_bastion ? 1 : 0
+
+  scheduled_action_name  = "schedule_work_hours_up"
+  min_size               = 1
+  max_size               = 1
+  desired_capacity       = 1
+  autoscaling_group_name = aws_autoscaling_group.asg[0].name
+  recurrence             = var.up_recurrence
 }

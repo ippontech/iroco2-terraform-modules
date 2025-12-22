@@ -14,8 +14,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-## ---------------------- NETWORK ------------------------------
-output "network_outputs" {
-  value       = module.network
-  description = "Network module outputs"
+data "aws_kms_public_key" "by_id" {
+  key_id = module.data.iroco_identity_provider_key_id.id
+}
+
+data "aws_kms_key" "signing_key" {
+  key_id = module.data.iroco_identity_provider_key_id.id
 }

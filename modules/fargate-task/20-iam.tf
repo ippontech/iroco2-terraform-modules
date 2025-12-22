@@ -16,7 +16,7 @@
 
 # Execution role for the service
 resource "aws_iam_role" "service" {
-  name = "${aws_ecs_service.main.name}-service-execution"
+  name = "${var.namespace}-${var.environment}-${var.project_name}-service-execution"
 
   assume_role_policy = <<EOF
 {
@@ -45,8 +45,8 @@ EOF
 }
 
 resource "aws_iam_policy" "service" {
-  name        = "${aws_ecs_service.main.name}-service-execution"
-  description = "Execution role policy for ${aws_ecs_service.main.name}"
+  name        = "${var.namespace}-${var.environment}-${var.project_name}-service-execution"
+  description = "Execution role policy for ${var.namespace}-${var.environment}-${var.project_name}"
   path        = "/"
   policy      = data.aws_iam_policy_document.service.json
 
@@ -153,13 +153,13 @@ data "aws_iam_policy_document" "s3_access_doc" {
 }
 
 resource "aws_iam_role_policy" "s3_access" {
-  name   = "${aws_ecs_service.main.name}-s3-access-policy"
+  name   = "${var.namespace}-${var.environment}-${var.project_name}-s3-access-policy"
   role   = aws_iam_role.task.name
   policy = data.aws_iam_policy_document.s3_access_doc.json
 }
 
 resource "aws_iam_role" "task" {
-  name               = "${aws_ecs_service.main.name}-task-role"
+  name               = "${var.namespace}-${var.environment}-${var.project_name}-task-role"
   assume_role_policy = data.aws_iam_policy_document.task_assume_role.json
 
   tags = {

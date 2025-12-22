@@ -80,6 +80,11 @@ variable "single_nat_gateway" {
   default     = false
 }
 
+variable "cors_allowed_origins" {
+  type        = string
+  description = "List of allowed origins for CORS"
+}
+
 ## ---------------------- SERVICES ------------------------------
 variable "container_insight_setting_value" {
   type        = string
@@ -168,6 +173,11 @@ variable "bastion_volume_size" {
 variable "down_recurrence" {
   type        = string
   description = "Down Recurrence"
+}
+
+variable "up_recurrence" {
+  type        = string
+  description = "Up Recurrence"
 }
 
 ## ---------------------- ECS TASK ------------------------------
