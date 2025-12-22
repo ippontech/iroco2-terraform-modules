@@ -57,7 +57,7 @@ data "aws_prefix_list" "prefix_list" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "prefix_lists" {
-  for_each = { for r in local.all_egress_prefix_list : r.name => r }
+  for_each = var.create_vpc_endpoints ? { for r in local.all_egress_prefix_list : r.name => r } : {}
 
   description = each.value.description
 
@@ -70,6 +70,22 @@ resource "aws_vpc_security_group_egress_rule" "prefix_lists" {
 
   tags = {
     Name    = "${var.namespace}-${var.environment}-${replace(each.value.name, "_", "-")}"
+    project = var.project_name
+  }
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_all_egress" {
+  for_each = var.create_vpc_endpoints ? {} : aws_security_group.this
+
+  description = "Global allow-all egress"
+
+  ip_protocol = "-1"
+  cidr_ipv4   = "0.0.0.0/0"
+
+  security_group_id = each.value.id
+
+  tags = {
+    Name    = "${var.namespace}-${var.environment}-allow-all-egress"
     project = var.project_name
   }
 }
@@ -93,7 +109,7 @@ resource "aws_vpc_security_group_ingress_rule" "computed" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "this" {
-  for_each = { for r in local.all_egress_rules : r.name => r }
+  for_each = var.create_vpc_endpoints ? { for r in local.all_egress_rules : r.name => r } : {}
 
   description = each.value.rule.description
 
