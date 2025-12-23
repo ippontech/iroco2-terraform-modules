@@ -68,21 +68,21 @@ variable "subdomain_name" {
   description = "The subdomain that will be prefixed to the zone name to create the final domain name. Example : `iroco2` => iroco2.test.yourdomain.com"
 }
 
-variable "enable_nat_gateway" {
-  description = "Should be true if you want to provision NAT Gateways for each of your private networks"
-  type        = bool
-  default     = false
-}
-
-variable "single_nat_gateway" {
-  description = "Should be true if you want to provision a single shared NAT Gateway across all of your private networks"
-  type        = bool
-  default     = false
-}
-
 variable "cors_allowed_origins" {
   type        = string
   description = "List of allowed origins for CORS"
+}
+
+# Whether to create VPC endpoints (Interface endpoints) in the VPC. We recommend to use NAT Gateway by default.
+# Our VPC endpoints setup is using SSM documents in order to be:
+# - Better FinOps, as it's cheaper than a NAT Gateway (when scheduled for work hours)
+# - Better security, as it's using private endpoints instead of public ones
+# But be careful, SSM documents deploying VPC endpoints means:
+# - Trigger manually the SSM document to create VPC endpoints the first time you deploy the stack, or wait for the first time the SSM document is triggered by the schedule
+# - Be sure to have an ECR repository with the images for backend service + keycloak
+variable "create_vpc_endpoints" {
+  description = "Controls if VPC Endpoints configuration should be created"
+  type        = bool
 }
 
 ## ---------------------- SERVICES ------------------------------
