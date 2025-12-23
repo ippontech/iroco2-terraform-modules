@@ -11,8 +11,8 @@ module "network" {
   database_subnets     = var.database_subnets
   subdomain_name       = var.subdomain_name
   zone_name            = var.zone_name
-  enable_nat_gateway   = var.enable_nat_gateway
-  single_nat_gateway   = var.single_nat_gateway
+  enable_nat_gateway   = var.create_vpc_endpoints == false ? true : false
+  single_nat_gateway   = true
   create_vpc_endpoints = var.create_vpc_endpoints
 }
 
