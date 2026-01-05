@@ -5,14 +5,15 @@ module "network" {
   environment  = var.environment
   aws_region   = var.aws_region
 
-  cidr               = var.cidr
-  private_subnets    = var.private_subnets
-  public_subnets     = var.public_subnets
-  database_subnets   = var.database_subnets
-  subdomain_name     = var.subdomain_name
-  zone_name          = var.zone_name
-  enable_nat_gateway = var.enable_nat_gateway
-  single_nat_gateway = var.single_nat_gateway
+  cidr                 = var.cidr
+  private_subnets      = var.private_subnets
+  public_subnets       = var.public_subnets
+  database_subnets     = var.database_subnets
+  subdomain_name       = var.subdomain_name
+  zone_name            = var.zone_name
+  enable_nat_gateway   = var.create_vpc_endpoints == false ? true : false
+  single_nat_gateway   = true
+  create_vpc_endpoints = var.create_vpc_endpoints
 }
 
 module "services" {

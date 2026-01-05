@@ -21,12 +21,14 @@ variable "tag_autoshutdown" {
 }
 
 resource "aws_ssm_document" "vpcendpoints_create" {
+  count = var.create_vpc_endpoints ? 1 : 0
+
   name            = "${var.namespace}-${var.environment}-CreateVpcEndpoints"
   document_format = "YAML"
   document_type   = "Automation"
 
   content = templatefile("${path.module}/template/CreateVpcEndpoints-function.yaml", {
-    aws_iam_role_arn = aws_iam_role.ssm.arn
+    aws_iam_role_arn = aws_iam_role.ssm[0].arn
   })
 
   tags = {
@@ -35,12 +37,14 @@ resource "aws_ssm_document" "vpcendpoints_create" {
 }
 
 resource "aws_ssm_document" "vpcendpoints_delete" {
+  count = var.create_vpc_endpoints ? 1 : 0
+
   name            = "${var.namespace}-${var.environment}-DeleteVpcEndpoints"
   document_format = "YAML"
   document_type   = "Automation"
 
   content = templatefile("${path.module}/template/DeleteVpcEndpoints-function.yaml", {
-    aws_iam_role_arn = aws_iam_role.ssm.arn
+    aws_iam_role_arn = aws_iam_role.ssm[0].arn
   })
 
   tags = {
@@ -51,7 +55,7 @@ resource "aws_ssm_document" "vpcendpoints_delete" {
 module "start_endpoint_scheduling_ssm" {
   source = "./modules/start_endpoint_scheduling_ssm"
 
-  for_each = { for index, endpoint in local.vpc_endpoints_interface : endpoint.name_tag => endpoint }
+  for_each = var.create_vpc_endpoints ? { for index, endpoint in local.vpc_endpoints_interface : endpoint.name_tag => endpoint } : {}
 
   endpoint = each.value
 
@@ -63,23 +67,29 @@ module "start_endpoint_scheduling_ssm" {
   tag_autoshutdown = var.tag_autoshutdown
   namespace        = var.namespace
   environment      = var.environment
-  ssm_document     = aws_ssm_document.vpcendpoints_create.name
+  ssm_document     = aws_ssm_document.vpcendpoints_create[0].name
   working_days     = local.working_days
 }
 
 module "stop_endpoint_scheduling_ssm" {
   source = "./modules/stop_endpoint_scheduling_ssm"
 
-  ssm_document     = aws_ssm_document.vpcendpoints_delete.name
+  count = var.create_vpc_endpoints ? 1 : 0
+
+  ssm_document     = aws_ssm_document.vpcendpoints_delete[0].name
   tag_autoshutdown = var.tag_autoshutdown
   working_days     = local.working_days
+  environment      = var.environment
+  namespace        = var.namespace
 }
 
 # We need this local exec to clean up the VPC Endpoints (that are managed by SSM Automation) on destroy
 resource "null_resource" "cleanup_vpc_endpoints_on_destroy" {
+  count = var.create_vpc_endpoints ? 1 : 0
+
   triggers = {
     vpc_id   = module.vpc.vpc_id
-    doc_name = aws_ssm_document.vpcendpoints_delete.name
+    doc_name = aws_ssm_document.vpcendpoints_delete[0].name
     tag_val  = var.tag_autoshutdown
     env_val  = var.environment
     ns_val   = var.namespace

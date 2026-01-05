@@ -86,3 +86,8 @@ variable "single_nat_gateway" {
   type        = bool
   default     = false
 }
+
+variable "create_vpc_endpoints" {
+  description = "Controls if VPC Endpoints configuration should be created"
+  type        = bool
+}
