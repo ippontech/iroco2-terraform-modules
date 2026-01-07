@@ -51,3 +51,73 @@ resource "aws_secretsmanager_secret_version" "rds_master_pass" {
     }
   )
 }
+
+# Password for Keycloak DB
+resource "random_password" "rds_keycloak_pass" {
+  length           = 40
+  special          = true
+  min_special      = 5
+  override_special = "!#$%^&*()-_=+[]{}<>:?"
+
+  lifecycle {
+    ignore_changes = [
+      override_special,
+      min_special
+    ]
+  }
+}
+
+# The secret for Keycloak DB
+resource "aws_secretsmanager_secret" "rds_keycloak_pass" {
+  name = "${var.namespace}/${var.environment}/rds/keycloak-db-secret"
+
+  tags = {
+    project = var.project_name
+  }
+}
+
+# Initial version for Keycloak DB
+resource "aws_secretsmanager_secret_version" "rds_keycloak_pass" {
+  secret_id = aws_secretsmanager_secret.rds_keycloak_pass.id
+  secret_string = jsonencode(
+    {
+      username = "keycloak"
+      password = random_password.rds_keycloak_pass.result
+    }
+  )
+}
+
+# Password for Keycloak Admin
+resource "random_password" "rds_keycloak_admin_pass" {
+  length           = 40
+  special          = true
+  min_special      = 5
+  override_special = "!#$%^&*()-_=+[]{}<>:?"
+
+  lifecycle {
+    ignore_changes = [
+      override_special,
+      min_special
+    ]
+  }
+}
+
+# The secret for Keycloak Admin
+resource "aws_secretsmanager_secret" "rds_keycloak_admin_pass" {
+  name = "${var.namespace}/${var.environment}/rds/keycloak-admin-secret"
+
+  tags = {
+    project = var.project_name
+  }
+}
+
+# Initial version for Keycloak Admin
+resource "aws_secretsmanager_secret_version" "rds_keycloak_admin_pass" {
+  secret_id = aws_secretsmanager_secret.rds_keycloak_admin_pass.id
+  secret_string = jsonencode(
+    {
+      KEYCLOAK_ADMIN          = "keycloak-admin"
+      KEYCLOAK_ADMIN_PASSWORD = random_password.rds_keycloak_admin_pass.result
+    }
+  )
+}

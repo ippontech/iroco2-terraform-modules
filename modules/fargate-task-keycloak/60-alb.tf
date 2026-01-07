@@ -15,7 +15,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Target Group
-resource "aws_lb_target_group" "api" {
+resource "aws_lb_target_group" "keycloak" {
   name        = "${var.project_name}-${var.environment}"
   port        = var.container_port
   protocol    = "HTTP"
@@ -24,7 +24,7 @@ resource "aws_lb_target_group" "api" {
 
   health_check {
     enabled             = true
-    path                = "/actuator/health"
+    path                = "/health"
     matcher             = "200"
     interval            = 30
     healthy_threshold   = 2
@@ -41,23 +41,18 @@ resource "aws_lb_target_group" "api" {
   }
 }
 
-resource "aws_lb_listener_rule" "api" {
+resource "aws_lb_listener_rule" "keycloak" {
   listener_arn = var.alb_listener_arn
+  priority     = 200
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.api.arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["/*"]
-    }
+    target_group_arn = aws_lb_target_group.keycloak.arn
   }
 
   condition {
     host_header {
-      values = ["api.${local.domain_name}"]
+      values = ["auth.${local.domain_name}"]
     }
   }
 

@@ -36,19 +36,6 @@ variable "aws_region" {
   description = "The AWS region to deploy to"
 }
 
-variable "failover_mailing_list" {
-  type        = list(string)
-  description = "The mailing list to send alerts to"
-  default = [
-    # TODO: Add developers email after testing
-  ]
-}
-
-variable "cur_s3_bucket_arn" {
-  type        = string
-  description = "The ARN of the S3 bucket where the CUR is stored"
-}
-
 variable "kms_identity_key_arn" {
   type        = string
   description = "The key arn of the kms key used for identity"
@@ -145,6 +132,11 @@ variable "container_desired_count" {
     condition     = var.container_desired_count >= 1
     error_message = "You should have at least one instance running."
   }
+}
+
+variable "container_command" {
+  description = "The command to run in the container"
+  type        = list(string)
 }
 
 #### APP SPECIFICS ####

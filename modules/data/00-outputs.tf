@@ -23,6 +23,7 @@ output "rds_database" {
   value = {
     db_instance_arn      = module.rds.db_instance_arn
     db_instance_endpoint = module.rds.db_instance_endpoint
+    db_instance_address  = module.rds.db_instance_address
     db_instance_name     = module.rds.db_instance_name
     db_instance_port     = module.rds.db_instance_port
   }
@@ -31,5 +32,15 @@ output "rds_database" {
 
 output "rds_database_secret_arn" {
   value       = aws_secretsmanager_secret.rds_master_pass.arn
+  description = "The ARN of the secret containing the RDS master password"
+}
+
+output "rds_keycloak_secret_arn" {
+  value       = aws_secretsmanager_secret.rds_keycloak_pass.arn
+  description = "The ARN of the secret containing the RDS master password"
+}
+
+output "rds_keycloak_admin_secret_arn" {
+  value       = aws_secretsmanager_secret.rds_keycloak_admin_pass.arn
   description = "The ARN of the secret containing the RDS master password"
 }

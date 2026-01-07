@@ -13,30 +13,11 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-variable "namespace" {
-  type        = string
-  description = "The namespace in which the project is."
-  default     = "iroco2"
+
+data "aws_route53_zone" "main" {
+  name = var.zone_name
 }
 
-variable "environment" {
-  type        = string
-  description = "The name of the environment we are deploying to"
-}
-
-variable "project_name" {
-  type        = string
-  description = "Project's name"
-  default     = "keycloak"
-}
-
-variable "project_type" {
-  type        = string
-  description = "The type of project."
-  default     = "application"
-}
-
-variable "front_domain_name" {
-  type        = string
-  description = "The name of the front. Used for S3 CORS configuration"
+data "aws_kms_alias" "secrets_manager" {
+  name = "alias/aws/secretsmanager"
 }

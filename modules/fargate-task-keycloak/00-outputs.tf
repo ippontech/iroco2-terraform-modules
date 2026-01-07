@@ -13,30 +13,23 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-variable "namespace" {
-  type        = string
-  description = "The namespace in which the project is."
-  default     = "iroco2"
+
+output "ecs_task_definition" {
+  value       = aws_ecs_task_definition.keycloak
+  description = "ECS task definition"
 }
 
-variable "environment" {
-  type        = string
-  description = "The name of the environment we are deploying to"
+output "ecs_service" {
+  value       = aws_ecs_service.main
+  description = "ECS service"
 }
 
-variable "project_name" {
-  type        = string
-  description = "Project's name"
-  default     = "keycloak"
+output "alb_target_group" {
+  value       = aws_lb_target_group.keycloak
+  description = "ALB target group"
 }
 
-variable "project_type" {
-  type        = string
-  description = "The type of project."
-  default     = "application"
-}
-
-variable "front_domain_name" {
-  type        = string
-  description = "The name of the front. Used for S3 CORS configuration"
+output "alb_listener_rule" {
+  value       = aws_lb_listener_rule.keycloak
+  description = "ALB listener rule"
 }
