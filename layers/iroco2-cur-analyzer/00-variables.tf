@@ -27,7 +27,7 @@ variable "environment" {
 variable "project_name" {
   type        = string
   description = "Project's name"
-  default     = "keycloak"
+  default     = "cur"
 }
 
 variable "project_type" {
