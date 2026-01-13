@@ -22,7 +22,7 @@ module "vpc" {
 
   cidr = var.cidr
 
-  azs                   = var.azs[data.aws_region.this.name]
+  azs                   = var.azs[data.aws_region.this.region]
   public_subnets        = var.public_subnets
   public_subnet_names   = [for az in var.azs[var.aws_region] : "${var.namespace}-${var.environment}-public-subnet-${az}"]
   private_subnets       = var.private_subnets

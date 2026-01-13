@@ -19,7 +19,7 @@ locals {
   prefix_list_ids = {
     vpce_s3 = {
       alias = "vpce_s3_prefix_list"
-      name  = "com.amazonaws.${data.aws_region.this.name}.s3"
+      name  = "com.amazonaws.${data.aws_region.this.region}.s3"
     }
   }
 
