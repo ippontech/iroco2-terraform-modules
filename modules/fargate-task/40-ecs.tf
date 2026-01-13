@@ -32,6 +32,8 @@ resource "aws_ecs_task_definition" "api" {
       essential   = true
       environment = local.task_environment
       secrets     = concat(local.task_secrets_arn, local.task_secrets_arn_with_key)
+      command     = var.container_command
+      entryPoint  = var.entrypoint
       portMappings = [
         {
           containerPort = var.container_port

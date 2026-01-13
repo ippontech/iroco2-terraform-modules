@@ -47,6 +47,7 @@ variable "failover_mailing_list" {
 variable "cur_s3_bucket_arn" {
   type        = string
   description = "The ARN of the S3 bucket where the CUR is stored"
+  default     = null
 }
 
 variable "kms_identity_key_arn" {
@@ -89,6 +90,11 @@ variable "zone_name" {
 variable "subdomain_name" {
   type        = string
   description = "The subdomain that will be prefixed to the zone name to create the final domain name. Example : `iroco2` => iroco2.test.yourdomain.com"
+}
+
+variable "dns_prefix" {
+  type        = string
+  description = "The prefix to use for the DNS record"
 }
 
 variable "alb_dns_name" {
@@ -145,6 +151,18 @@ variable "container_desired_count" {
     condition     = var.container_desired_count >= 1
     error_message = "You should have at least one instance running."
   }
+}
+
+variable "container_command" {
+  description = "The command to run in the container"
+  type        = list(string)
+  default     = null
+}
+
+variable "entrypoint" {
+  description = "The entrypoint to run in the container"
+  type        = list(string)
+  default     = null
 }
 
 #### APP SPECIFICS ####

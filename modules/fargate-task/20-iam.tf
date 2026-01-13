@@ -115,18 +115,24 @@ data "aws_iam_policy_document" "task_assume_role" {
 }
 
 data "aws_iam_policy_document" "s3_access_doc" {
-  statement {
-    effect = "Allow"
 
-    actions = [
-      "s3:ListBucket",
-      "s3:GetObject",
-      "s3:PutObject"
-    ]
-    resources = [
-      var.cur_s3_bucket_arn,
-      "${var.cur_s3_bucket_arn}/*"
-    ]
+  dynamic "statement" {
+    for_each = var.cur_s3_bucket_arn != null ? [1] : []
+
+    content {
+      effect = "Allow"
+
+      actions = [
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:PutObject"
+      ]
+
+      resources = [
+        var.cur_s3_bucket_arn,
+        "${var.cur_s3_bucket_arn}/*"
+      ]
+    }
   }
 
   statement {

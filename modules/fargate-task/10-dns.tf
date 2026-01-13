@@ -16,7 +16,7 @@
 
 resource "aws_route53_record" "alb_public" {
   zone_id = data.aws_route53_zone.main.id
-  name    = "api.${local.domain_name}"
+  name    = "${var.dns_prefix}.${local.domain_name}"
   type    = "A"
   alias {
     name                   = var.alb_dns_name

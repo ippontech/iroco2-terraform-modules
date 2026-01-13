@@ -138,6 +138,7 @@ module "backend_api" {
   alb_listener_arn   = module.network.alb_listener_https_arn
   subdomain_name     = var.subdomain_name
   zone_name          = var.zone_name
+  dns_prefix         = "api"
 
   # ECS variables
   cluster_name                  = module.services.cluster.name
@@ -152,6 +153,7 @@ module "backend_api" {
 
   task_container_environment = {
     DATABASE_NAME                      = module.data.rds_database.db_instance_name
+    IROCO2_DATA_SOURCE_URL             = module.data.rds_database.db_instance_endpoint
     IROCO2_CORS_ALLOWED_ORIGINS        = "https://${var.subdomain_name}.${var.zone_name},http://localhost:3000"
     IROCO2_AWS_ANALYZER_SQS_QUEUE_NAME = module.lambda_cur.analyzer_sqs_cur_name
     IROCO2_AWS_SCANNER_SQS_QUEUE_NAME  = module.lambda_cur.scanner_sqs_cur_name
@@ -168,10 +170,6 @@ module "backend_api" {
   }
   task_container_secrets_arn = {}
   task_container_secrets_arn_with_key = {
-    IROCO2_DATA_SOURCE_URL = {
-      arn = module.data.rds_database_secret_arn
-      key = "host"
-    }
     IROCO2_DATA_SOURCE_USERNAME = {
       arn = module.data.rds_database_secret_arn
       key = "username"
@@ -192,7 +190,7 @@ module "backend_api" {
 }
 
 module "keycloak" {
-  source = "./modules/fargate-task-keycloak"
+  source = "./modules/fargate-task"
 
   # Global variables
   aws_region   = var.aws_region
@@ -208,6 +206,7 @@ module "keycloak" {
   alb_listener_arn   = module.network.alb_listener_https_arn
   subdomain_name     = var.subdomain_name
   zone_name          = var.zone_name
+  dns_prefix         = "auth"
 
   # ECS variables
   cluster_name                  = module.services.cluster.name
@@ -217,6 +216,7 @@ module "keycloak" {
   container_port                = 8080
   container_image               = "quay.io/keycloak/keycloak:24.0.1"
   container_desired_count       = var.container_desired_count
+  entrypoint                    = ["sh"]
   container_command             = ["-c", "/opt/keycloak/bin/kc.sh build --health-enabled=true && /opt/keycloak/bin/kc.sh start --http-enabled=true --hostname=$HOSTNAME"]
   kms_identity_key_arn          = data.aws_kms_key.signing_key.arn
   ecs_backend_security_group_id = module.network.security_group_ids["iroco2-${var.environment}-keycloak"]

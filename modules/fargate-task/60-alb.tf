@@ -49,15 +49,18 @@ resource "aws_lb_listener_rule" "api" {
     target_group_arn = aws_lb_target_group.api.arn
   }
 
-  condition {
-    path_pattern {
-      values = ["/*"]
+  dynamic "condition" {
+    for_each = var.dns_prefix == "api" ? [1] : []
+    content {
+      path_pattern {
+        values = ["/*"]
+      }
     }
   }
 
   condition {
     host_header {
-      values = ["api.${local.domain_name}"]
+      values = ["${var.dns_prefix}.${local.domain_name}"]
     }
   }
 
