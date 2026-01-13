@@ -15,18 +15,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Initial password
-resource "random_password" "rds_master_pass" {
-  length           = 40
-  special          = true
-  min_special      = 5
-  override_special = "!#$%^&*()-_=+[]{}<>:?"
-
-  lifecycle {
-    ignore_changes = [
-      override_special,
-      min_special
-    ]
-  }
+ephemeral "random_password" "rds_master_pass" {
+  length  = 40
+  special = false
 }
 
 # The secret
@@ -40,31 +31,26 @@ resource "aws_secretsmanager_secret" "rds_master_pass" {
 
 # Initial version
 resource "aws_secretsmanager_secret_version" "rds_master_pass" {
-  secret_id = aws_secretsmanager_secret.rds_master_pass.id
-  secret_string = jsonencode(
+  secret_id                = aws_secretsmanager_secret.rds_master_pass.id
+  secret_string_wo_version = 1
+  secret_string_wo = jsonencode(
     {
-      username = module.rds.db_instance_username
-      password = module.rds.db_instance_password
-      engine   = module.rds.db_instance_engine
-      host     = module.rds.db_instance_endpoint
-      jdbc_url = format("jdbc:postgresql://%s/%s", module.rds.db_instance_endpoint, var.rds_database_name)
+      username = var.rds_database_name
+      password = ephemeral.random_password.rds_master_pass.result
     }
   )
 }
 
+ephemeral "aws_secretsmanager_secret_version" "rds_master_pass" {
+  secret_id = aws_secretsmanager_secret_version.rds_master_pass.secret_id
+}
+
 # Password for Keycloak DB
-resource "random_password" "rds_keycloak_pass" {
+ephemeral "random_password" "rds_keycloak_pass" {
   length           = 40
   special          = true
   min_special      = 5
   override_special = "!#$%^&*()-_=+[]{}<>:?"
-
-  lifecycle {
-    ignore_changes = [
-      override_special,
-      min_special
-    ]
-  }
 }
 
 # The secret for Keycloak DB
@@ -78,28 +64,22 @@ resource "aws_secretsmanager_secret" "rds_keycloak_pass" {
 
 # Initial version for Keycloak DB
 resource "aws_secretsmanager_secret_version" "rds_keycloak_pass" {
-  secret_id = aws_secretsmanager_secret.rds_keycloak_pass.id
-  secret_string = jsonencode(
+  secret_id                = aws_secretsmanager_secret.rds_keycloak_pass.id
+  secret_string_wo_version = 1
+  secret_string_wo = jsonencode(
     {
       username = "keycloak"
-      password = random_password.rds_keycloak_pass.result
+      password = ephemeral.random_password.rds_keycloak_pass.result
     }
   )
 }
 
 # Password for Keycloak Admin
-resource "random_password" "rds_keycloak_admin_pass" {
+ephemeral "random_password" "rds_keycloak_admin_pass" {
   length           = 40
   special          = true
   min_special      = 5
   override_special = "!#$%^&*()-_=+[]{}<>:?"
-
-  lifecycle {
-    ignore_changes = [
-      override_special,
-      min_special
-    ]
-  }
 }
 
 # The secret for Keycloak Admin
@@ -113,11 +93,12 @@ resource "aws_secretsmanager_secret" "rds_keycloak_admin_pass" {
 
 # Initial version for Keycloak Admin
 resource "aws_secretsmanager_secret_version" "rds_keycloak_admin_pass" {
-  secret_id = aws_secretsmanager_secret.rds_keycloak_admin_pass.id
-  secret_string = jsonencode(
+  secret_id                = aws_secretsmanager_secret.rds_keycloak_admin_pass.id
+  secret_string_wo_version = 1
+  secret_string_wo = jsonencode(
     {
       KEYCLOAK_ADMIN          = "keycloak-admin"
-      KEYCLOAK_ADMIN_PASSWORD = random_password.rds_keycloak_admin_pass.result
+      KEYCLOAK_ADMIN_PASSWORD = ephemeral.random_password.rds_keycloak_admin_pass.result
     }
   )
 }

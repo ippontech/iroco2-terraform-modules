@@ -19,3 +19,4 @@ yarn-error.log
 *.zip
 bootstrap
 lambda_payload.json
+**lambda_response.json
