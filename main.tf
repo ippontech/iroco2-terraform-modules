@@ -136,6 +136,7 @@ module "backend_api" {
   alb_zone_id        = module.network.alb_zone_id
   alb_arn_suffix     = module.network.alb_arn_suffix
   alb_listener_arn   = module.network.alb_listener_https_arn
+  alb_health_check   = "/actuator/health"
   subdomain_name     = var.subdomain_name
   zone_name          = var.zone_name
   dns_prefix         = "api"
@@ -204,6 +205,7 @@ module "keycloak" {
   alb_zone_id        = module.network.alb_zone_id
   alb_arn_suffix     = module.network.alb_arn_suffix
   alb_listener_arn   = module.network.alb_listener_https_arn
+  alb_health_check   = "/health"
   subdomain_name     = var.subdomain_name
   zone_name          = var.zone_name
   dns_prefix         = "auth"

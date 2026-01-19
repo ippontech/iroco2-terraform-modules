@@ -117,6 +117,11 @@ variable "alb_listener_arn" {
   description = "ALB listener ARN"
 }
 
+variable "alb_health_check" {
+  type        = string
+  description = "ALB health check path"
+}
+
 #### CONTAINER ####
 variable "container_cpu" {
   type        = number

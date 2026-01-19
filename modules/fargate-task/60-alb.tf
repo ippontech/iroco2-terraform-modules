@@ -24,7 +24,7 @@ resource "aws_lb_target_group" "api" {
 
   health_check {
     enabled             = true
-    path                = "/actuator/health"
+    path                = var.alb_health_check
     matcher             = "200"
     interval            = 30
     healthy_threshold   = 2

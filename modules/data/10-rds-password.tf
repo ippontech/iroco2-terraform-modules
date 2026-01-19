@@ -35,7 +35,7 @@ resource "aws_secretsmanager_secret_version" "rds_master_pass" {
   secret_string_wo_version = 1
   secret_string_wo = jsonencode(
     {
-      username = var.rds_database_name
+      username = var.namespace
       password = ephemeral.random_password.rds_master_pass.result
     }
   )
