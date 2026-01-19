@@ -24,7 +24,7 @@ resource "aws_lb_target_group" "api" {
 
   health_check {
     enabled             = true
-    path                = "/actuator/health"
+    path                = var.alb_health_check
     matcher             = "200"
     interval            = 30
     healthy_threshold   = 2
@@ -49,9 +49,18 @@ resource "aws_lb_listener_rule" "api" {
     target_group_arn = aws_lb_target_group.api.arn
   }
 
+  dynamic "condition" {
+    for_each = var.dns_prefix == "api" ? [1] : []
+    content {
+      path_pattern {
+        values = ["/*"]
+      }
+    }
+  }
+
   condition {
-    path_pattern {
-      values = ["/*"]
+    host_header {
+      values = ["${var.dns_prefix}.${local.domain_name}"]
     }
   }
 

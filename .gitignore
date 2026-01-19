@@ -18,3 +18,5 @@ yarn-error.log
 # Deployement archives & builds
 *.zip
 bootstrap
+lambda_payload.json
+**lambda_response.json

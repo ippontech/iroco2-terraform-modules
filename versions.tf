@@ -15,12 +15,16 @@
 # SPDX-License-Identifier: Apache-2.0
 
 terraform {
-  required_version = ">= 1.0.0"
+  required_version = "1.14.3"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "5.68.0"
+      version = "6.28.0"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "2.6.1"
     }
   }
 }

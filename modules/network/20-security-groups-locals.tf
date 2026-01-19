@@ -19,11 +19,19 @@ locals {
   prefix_list_ids = {
     vpce_s3 = {
       alias = "vpce_s3_prefix_list"
-      name  = "com.amazonaws.${data.aws_region.this.name}.s3"
+      name  = "com.amazonaws.${data.aws_region.this.region}.s3"
     }
   }
 
   common_egress_rules = {
+    egress_all = [
+      {
+        description = "Allow all outbound traffic"
+        port        = 0
+        protocol    = "-1"
+        cidr_ipv4   = "0.0.0.0/0"
+      }
+    ]
     ingress_wide_private_subnet = [
       {
         description = "Allow TLS communication from anywhere in the private subnets 0"
@@ -131,6 +139,26 @@ locals {
       description   = "The VPC endpoint SSM Messages security group",
       ingress_rules = local.common_egress_rules.ingress_wide_private_subnet
     }
+    keycloak = {
+      description = "The Keycloak security group",
+      egress_rules = concat(
+        local.common_egress_rules.egress_all,
+      )
+      ingress_rules = [
+        {
+          description   = "Allow incoming communication from ALB to Keycloak"
+          port          = 8080
+          protocol      = "tcp"
+          referenced_sg = "alb"
+        }
+      ]
+    }
+    rds_lambda_provisioner = {
+      description = "The RDS Lambda Provisioner security group",
+      egress_rules = concat(
+        local.common_egress_rules.egress_all,
+      )
+    }
     iroco_backend = {
       description = "The IroCO backend security group",
       egress_rules = concat(
@@ -155,6 +183,20 @@ locals {
         local.common_egress_rules.vpce_logs,
         local.common_egress_rules.vpce_ssm
       )
+      ingress_rules = [
+        {
+          description   = "Allow incoming communication from Lambda Provisioner to IroCO database"
+          port          = 5432
+          protocol      = "tcp"
+          referenced_sg = "rds_lambda_provisioner"
+        },
+        {
+          description   = "Allow incoming communication from Keycloak to IroCO database"
+          port          = 5432
+          protocol      = "tcp"
+          referenced_sg = "keycloak"
+        }
+      ]
     }
     bastion = {
       description  = "The bastion security group"

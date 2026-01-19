@@ -74,7 +74,7 @@ resource "aws_lambda_function" "lambda_function" {
   environment {
     variables = {
       "QUEUE_URL" = aws_sqs_queue.analyzer_sqs_queue.url
-      "REGION"    = data.aws_region.current.name
+      "REGION"    = data.aws_region.current.region
     }
   }
 

@@ -20,7 +20,7 @@ locals {
 
 module "rds" {
   source  = "terraform-aws-modules/rds/aws"
-  version = "5.2.3"
+  version = "7.0.1"
 
   # General
   identifier = local.rds_db_identifier
@@ -40,9 +40,10 @@ module "rds" {
 
   # Security
   username                            = var.namespace
-  password                            = random_password.rds_master_pass.result
+  password_wo                         = jsondecode(ephemeral.aws_secretsmanager_secret_version.rds_master_pass.secret_string).password
+  password_wo_version                 = aws_secretsmanager_secret_version.rds_master_pass.secret_string_wo_version
   iam_database_authentication_enabled = false
-  create_random_password              = false
+  manage_master_user_password         = false
 
   # Network
   port                   = var.rds_database_port
