@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install semantic-release
+        run: npm install -g semantic-release @semantic-release/git @semantic-release/github @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/changelog conventional-changelog-conventionalcommits
+
+      - name: Detect changed lambdas
+        id: lambdas
+        run: |
+          PREV_SHA=$(git rev-parse HEAD^)
+          CHANGED=$(git diff --name-only $PREV_SHA HEAD \
+            | grep '^modules/lambdas/.*/src/' \
+            | cut -d/ -f3 \
+            | sort -u || true)
+
+          echo "changed<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create dist directory
+        run: mkdir -p dist
+
+      - name: Build Python lambdas
+        if: steps.lambdas.outputs.changed != ''
+        env:
+          CHANGED_LAMBDAS: ${{ steps.lambdas.outputs.changed }}
+        run: |
+          for LAMBDA in $CHANGED_LAMBDAS; do
+            if [ -f modules/lambdas/$LAMBDA/src/requirements.txt ]; then
+              echo "Building Python lambda: $LAMBDA"
+              docker run --rm \
+                -v "$PWD/modules/lambdas/$LAMBDA/src:/var/task" \
+                -v "$PWD/dist:/dist" \
+                public.ecr.aws/sam/build-python3.11:1.151.0-20251218034554 \
+                /bin/bash -c "
+                  pip install -r requirements.txt -t .
+                  zip -r /dist/$LAMBDA.zip .
+                "
+            fi
+          done
+
+      - name: Build Go lambdas
+        if: steps.lambdas.outputs.changed != ''
+        env:
+          CHANGED_LAMBDAS: ${{ steps.lambdas.outputs.changed }}
+        run: |
+          for LAMBDA in $CHANGED_LAMBDAS; do
+            if [ -f modules/lambdas/$LAMBDA/src/go.mod ]; then
+              echo "Building Go lambda: $LAMBDA"
+              cd modules/lambdas/$LAMBDA/src
+              GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bootstrap
+              zip $GITHUB_WORKSPACE/dist/$LAMBDA.zip bootstrap
+              rm bootstrap
+              cd -
+            fi
+          done
+
+      - name: Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: semantic-release
