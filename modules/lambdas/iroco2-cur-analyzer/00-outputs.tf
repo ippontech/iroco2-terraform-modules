@@ -33,6 +33,11 @@ output "scanner_sqs_cur_url" {
   description = "The url of the SQS queue for the scanner"
 }
 
+output "scanner_sqs_cur_arn" {
+  value       = aws_sqs_queue.scanner_sqs_queue.arn
+  description = "The ARN of the SQS queue for the scanner"
+}
+
 output "s3_cur_bucket_id" {
   value       = aws_s3_bucket.cur_s3_bucket.id
   description = "The ID of the S3 bucket for the CUR"

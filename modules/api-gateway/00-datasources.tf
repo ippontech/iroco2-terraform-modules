@@ -14,13 +14,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-terraform {
-  required_version = "~> 1.0"
+data "aws_region" "current" {}
 
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
+data "aws_caller_identity" "current" {}
+
+data "aws_sqs_queue" "scanner_sqs_queue" {
+  name = var.scanner_sqs_queue_name
 }
