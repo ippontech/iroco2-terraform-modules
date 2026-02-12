@@ -215,3 +215,14 @@ variable "container_desired_count" {
     error_message = "You should have at least one instance running."
   }
 }
+
+## ---------------------- API GATEWAY ------------------------------
+variable "lambda_authorizer_invoke_arn" {
+  type        = string
+  description = "Invoke ARN of the lambda authorizer function"
+}
+
+variable "lambda_authorizer_function_name" {
+  type        = string
+  description = "Name of the lambda authorizer function"
+}

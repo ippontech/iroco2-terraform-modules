@@ -14,9 +14,17 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-terraform {
-  backend "s3" {
-    key          = "api-gateway-infrastructure/eu-west-3/terraform.tfstate"
-    use_lockfile = true
-  }
+output "base_url" {
+  value       = aws_api_gateway_deployment.api_deployment_test.invoke_url
+  description = "The base URL of the API Gateway deployment"
+}
+
+output "rest_api_id" {
+  value       = aws_api_gateway_rest_api.Scanner_API.id
+  description = "The ID of the REST API"
+}
+
+output "stage_name" {
+  value       = aws_api_gateway_stage.api_stage_test.stage_name
+  description = "The name of the API Gateway stage"
 }

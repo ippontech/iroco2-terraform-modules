@@ -28,23 +28,25 @@ variable "environment" {
 variable "project_name" {
   type        = string
   description = "Project's name"
-  default     = "api-gateway-infrastructure"
+  default     = "api-gateway"
 }
 
-variable "project_type" {
+variable "lambda_authorizer_invoke_arn" {
   type        = string
-  description = "The type of project."
-  default     = "application"
+  description = "Invoke ARN of the lambda authorizer"
 }
 
-variable "aws_lambda_payload_cur_part_function_name" {
-  description = "Name of the lambda (in the outputs of the payload-cur-part lambda repository)"
-}
-
-variable "aws_lambda_payload_cur_part_invoke_arn" {
-  description = "Invoke ARN of the lambda (in the outputs of the payload-cur-part lambda repository)"
-}
-variable "tfstate_bucket" {
+variable "lambda_authorizer_function_name" {
   type        = string
-  description = "The tfstate bucket where to fetch some information from the other layers."
+  description = "Name of the lambda authorizer function"
+}
+
+variable "scanner_sqs_queue_name" {
+  type        = string
+  description = "Name of the scanner SQS queue"
+}
+
+variable "scanner_sqs_queue_arn" {
+  type        = string
+  description = "ARN of the scanner SQS queue"
 }

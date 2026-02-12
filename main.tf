@@ -252,3 +252,18 @@ module "keycloak" {
     }
   }
 }
+
+module "api_gateway" {
+  source = "./modules/api-gateway"
+
+  namespace    = var.namespace
+  environment  = var.environment
+  project_name = "api-gateway"
+
+  lambda_authorizer_invoke_arn    = var.lambda_authorizer_invoke_arn
+  lambda_authorizer_function_name = var.lambda_authorizer_function_name
+  scanner_sqs_queue_name          = module.lambda_cur.scanner_sqs_cur_name
+  scanner_sqs_queue_arn           = module.lambda_cur.scanner_sqs_cur_arn
+
+  depends_on = [module.lambda_cur]
+}

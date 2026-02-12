@@ -38,7 +38,7 @@ resource "aws_api_gateway_resource" "payload_cur_part_api_resource" {
 resource "aws_api_gateway_authorizer" "lambda_authorizer" {
   name                             = "lambda-authorizer"
   rest_api_id                      = aws_api_gateway_rest_api.Scanner_API.id
-  authorizer_uri                   = data.terraform_remote_state.lambda_authorizer.outputs.aws_lambda_invoke_arn
+  authorizer_uri                   = var.lambda_authorizer_invoke_arn
   authorizer_result_ttl_in_seconds = 300
   identity_source                  = "method.request.header.Authorization"
   type                             = "TOKEN"
@@ -54,10 +54,6 @@ resource "aws_api_gateway_method" "payload_cur_part_post_method" {
 }
 
 # Integration with SQS
-data "aws_sqs_queue" "scanner_sqs_queue" {
-  name = data.terraform_remote_state.cur_service.outputs.scanner_sqs_cur_name
-}
-
 resource "aws_api_gateway_integration" "payload_cur_part_sqs_integration" {
   rest_api_id             = aws_api_gateway_rest_api.Scanner_API.id
   resource_id             = aws_api_gateway_resource.payload_cur_part_api_resource.id
@@ -79,7 +75,7 @@ resource "aws_api_gateway_integration" "payload_cur_part_sqs_integration" {
 resource "aws_lambda_permission" "authorizer_aws_permission" {
   statement_id  = "AllowAPIGatewayInvokeAuthorizer"
   action        = "lambda:InvokeFunction"
-  function_name = data.terraform_remote_state.lambda_authorizer.outputs.aws_lambda_function_name
+  function_name = var.lambda_authorizer_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "arn:aws:execute-api:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.Scanner_API.id}/authorizers/${aws_api_gateway_authorizer.lambda_authorizer.id}"
 }
@@ -100,7 +96,7 @@ data "aws_iam_policy_document" "api_gateway_permissions" {
   statement {
     effect    = "Allow"
     actions   = ["sqs:SendMessage"]
-    resources = [data.aws_sqs_queue.scanner_sqs_queue.arn]
+    resources = [var.scanner_sqs_queue_arn]
   }
 }
 
@@ -157,6 +153,6 @@ resource "aws_api_gateway_stage" "api_stage_test" {
   deployment_id = aws_api_gateway_deployment.api_deployment_test.id
 
   lifecycle {
-    ignore_changes = [deployment_id] # Prevents dependency cycle
+    ignore_changes = [deployment_id]
   }
 }
